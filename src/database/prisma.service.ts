@@ -13,41 +13,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   async onModuleInit() {
     await this.$connect();
     console.log('✅ Prisma Client conectado ao PostgreSQL.');
-
-    // Middleware para adicionar tenantId automaticamente em queries
-    this.$use(async (params, next) => {
-      // Modelos que requerem isolamento de tenant
-      const tenantIsolatedModels = ['Product', 'ContactRequest'];
-
-      if (tenantIsolatedModels.includes(params.model)) {
-        const tenantId = this.tenantContextService.getTenantId();
-
-        // Para operações de leitura (findUnique, findMany, etc)
-        if (['findUnique', 'findMany', 'findFirst', 'count'].includes(params.action)) {
-          if (params.args.where) {
-            params.args.where.tenantId = tenantId;
-          } else {
-            params.args.where = { tenantId };
-          }
-        }
-
-        // Para operações de atualização (update, updateMany)
-        if (['update', 'updateMany'].includes(params.action)) {
-          if (params.args.where) {
-            params.args.where.tenantId = tenantId;
-          }
-        }
-
-        // Para operações de exclusão (delete, deleteMany)
-        if (['delete', 'deleteMany'].includes(params.action)) {
-          if (params.args.where) {
-            params.args.where.tenantId = tenantId;
-          }
-        }
-      }
-
-      return next(params);
-    });
   }
 
   async onModuleDestroy() {

@@ -2,17 +2,17 @@ import { IsString, IsNumber, IsOptional, IsArray, IsBoolean } from 'class-valida
 
 export class CreateProductDto {
   @IsString()
-  name: string;
+  name!: string;
 
   @IsString()
-  description: string;
+  description!: string;
 
   @IsNumber()
-  price: number;
+  price!: number;
 
   @IsArray()
   @IsString({ each: true })
-  images: string[];
+  images!: string[];
 
   @IsOptional()
   specifications?: Record<string, any>;
