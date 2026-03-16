@@ -6,15 +6,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppService = void 0;
+exports.PrismaModule = void 0;
 const common_1 = require("@nestjs/common");
-let AppService = class AppService {
-    getHello() {
-        return '🚀 Bem-vindo ao NEXYSTEN MVP - Sistema SaaS Multi-tenant para Joias';
-    }
+const prisma_service_1 = require("./prisma.service");
+const tenant_module_1 = require("../tenant/tenant.module");
+let PrismaModule = class PrismaModule {
 };
-exports.AppService = AppService;
-exports.AppService = AppService = __decorate([
-    (0, common_1.Injectable)()
-], AppService);
-//# sourceMappingURL=app.service.js.map
+exports.PrismaModule = PrismaModule;
+exports.PrismaModule = PrismaModule = __decorate([
+    (0, common_1.Module)({
+        imports: [tenant_module_1.TenantModule],
+        providers: [prisma_service_1.PrismaService],
+        exports: [prisma_service_1.PrismaService],
+    })
+], PrismaModule);
+//# sourceMappingURL=prisma.module.js.map

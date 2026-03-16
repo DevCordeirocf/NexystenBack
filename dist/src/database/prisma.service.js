@@ -12,11 +12,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaService = void 0;
 const common_1 = require("@nestjs/common");
 const client_1 = require("@prisma/client");
+const tenant_context_service_1 = require("../tenant/tenant-context.service");
 let PrismaService = class PrismaService extends client_1.PrismaClient {
-    constructor() {
+    tenantContextService;
+    constructor(tenantContextService) {
         super({
             log: ['query', 'info', 'warn', 'error'],
         });
+        this.tenantContextService = tenantContextService;
     }
     async onModuleInit() {
         await this.$connect();
@@ -29,6 +32,6 @@ let PrismaService = class PrismaService extends client_1.PrismaClient {
 exports.PrismaService = PrismaService;
 exports.PrismaService = PrismaService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [tenant_context_service_1.TenantContextService])
 ], PrismaService);
 //# sourceMappingURL=prisma.service.js.map
