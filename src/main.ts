@@ -28,7 +28,7 @@ async function bootstrap() {
   console.log(`
 ╔════════════════════════════════════════════════════════════════╗
 ║                                                                ║
-║   🚀 NEXYSTEN MVP - Sistema SaaS Multi-tenant para Joias      ║
+║   NEXYSTEN MVP - Sistema SaaS Multi-tenant para Joias      ║
 ║                                                                ║
 ║   ✅ Servidor iniciado com sucesso!                           ║
 ║   📍 URL: http://localhost:${port}                             ║

@@ -2,11 +2,11 @@
 
 Bem-vindo ao **NEXYSTEN MVP**, uma plataforma simplificada de vitrine de joias com geração de leads, desenvolvida em **NestJS** com **PostgreSQL** e **Prisma**.
 
-## 🎯 Objetivo
+## Objetivo
 
 Permitir que múltiplas empresas de joias operem suas próprias vitrines de forma isolada, com clientes interessados podendo solicitar contato direto com a empresa vendedora.
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 - **Backend**: NestJS 10.x
 - **ORM**: Prisma 5.x
@@ -30,7 +30,7 @@ src/
 └── main.ts              # Bootstrap
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Clonar o Repositório
 
@@ -71,7 +71,7 @@ npm run start:dev
 
 O servidor estará disponível em: **http://localhost:3000**
 
-## 📚 API Endpoints
+## API Endpoints
 
 ### Produtos
 
@@ -93,7 +93,7 @@ O servidor estará disponível em: **http://localhost:3000**
 | PATCH | `/contact-requests/:id` | Atualizar status de uma solicitação |
 | DELETE | `/contact-requests/:id` | Deletar uma solicitação |
 
-## 🔐 Headers Obrigatórios
+## Headers Obrigatórios
 
 Todas as requisições devem incluir o header `X-Tenant-ID`:
 
@@ -101,7 +101,7 @@ Todas as requisições devem incluir o header `X-Tenant-ID`:
 curl -H "X-Tenant-ID: seu-uuid-do-tenant" http://localhost:3000/products
 ```
 
-## 📝 Exemplos de Requisições
+## Exemplos de Requisições
 
 ### Criar um Produto
 
@@ -136,7 +136,7 @@ curl -X POST http://localhost:3000/contact-requests \
   }'
 ```
 
-## 🧪 Testes
+## Testes
 
 ```bash
 # Testes unitários
@@ -149,7 +149,7 @@ npm run test:e2e
 npm run test:cov
 ```
 
-## 📦 Comandos Úteis
+## Comandos Úteis
 
 ```bash
 # Desenvolvimento
@@ -160,19 +160,19 @@ npm run start:prod         # Inicia em produção
 # Prisma
 npx prisma migrate dev     # Criar nova migration
 npx prisma migrate deploy  # Aplicar migrations em produção
-npx prisma studio         # UI visual para explorar banco de dados
+npx prisma studio          # UI visual para explorar banco de dados
 
 # Linting
-npm run lint              # Executar ESLint
-npm run format            # Formatar código com Prettier
-
+npm run lint               # Executar ESLint
+npm run format             # Formatar código com Prettier
+ 
 # Docker
-docker-compose up -d      # Iniciar todos os serviços
-docker-compose down       # Parar todos os serviços
-docker-compose logs -f    # Ver logs em tempo real
+docker-compose up -d       # Iniciar todos os serviços
+docker-compose down        # Parar todos os serviços
+docker-compose logs -f     # Ver logs em tempo real
 ```
 
-## 🔒 Segurança Multi-tenant
+## Segurança Multi-tenant
 
 O sistema implementa múltiplas camadas de isolamento:
 
@@ -181,13 +181,13 @@ O sistema implementa múltiplas camadas de isolamento:
 3. **Índices no Banco**: Otimizam queries filtradas por tenant
 4. **Validação de Autorização**: Endpoints protegidos validam JWT token
 
-## 📖 Documentação Completa
+## Documentação Completa
 
 Para documentação detalhada, consulte o arquivo `MVP_NEXYSTEN_DOCUMENTACAO_COMPLETA.md` na raiz do projeto.
 
-## 🛣️ Roadmap
+## Roadmap
 
-### Fase 1: MVP Base ✅
+### Fase 1: MVP Base 
 - [x] Estrutura de pastas
 - [x] Modelo de dados
 - [x] TenantInterceptor
@@ -217,7 +217,7 @@ Para documentação detalhada, consulte o arquivo `MVP_NEXYSTEN_DOCUMENTACAO_COM
 - [ ] CI/CD com GitHub Actions
 - [ ] Monitoramento e alertas
 
-## 🤝 Contribuindo
+## Contribuindo
 
 Para contribuir com o projeto, siga estas etapas:
 
@@ -227,14 +227,14 @@ Para contribuir com o projeto, siga estas etapas:
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
-## 📞 Suporte
+## Suporte
 
 Para dúvidas ou problemas, abra uma issue no repositório ou entre em contato:
 
 **Email**: luiscordeiro2006@gmail.com  
 **Repositório**: https://github.com/DevCordeirocf/Nexysten
 
-## 📄 Licença
+## Licença
 
 Este projeto está sob a licença UNLICENSED. Veja o arquivo LICENSE para mais detalhes.
 

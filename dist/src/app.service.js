@@ -10,7 +10,7 @@ exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
 let AppService = class AppService {
     getHello() {
-        return '🚀 Bem-vindo ao NEXYSTEN MVP - Sistema SaaS Multi-tenant para Joias';
+        return 'Bem-vindo ao NEXYSTEN MVP - Sistema SaaS Multi-tenant para Joias';
     }
 };
 exports.AppService = AppService;
