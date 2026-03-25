@@ -23,7 +23,30 @@ let PrismaService = class PrismaService extends client_1.PrismaClient {
     }
     async onModuleInit() {
         await this.$connect();
-        console.log('✅ Prisma Client conectado ao PostgreSQL.');
+        this.$use(async (params, next) => {
+            const tenantId = this.tenantContextService.getTenantId();
+            if (tenantId) {
+                if (params.model && ["Product", "ContactRequest"].includes(params.model)) {
+                    if (params.action === "findUnique" || params.action === "findFirst") {
+                        params.args.where = { ...params.args.where, tenantId };
+                    }
+                    else if (params.action === "findMany" || params.action === "count") {
+                        params.args.where = { ...params.args.where, tenantId };
+                    }
+                    else if (params.action === "create") {
+                        params.args.data = { ...params.args.data, tenantId };
+                    }
+                    else if (params.action === "update" || params.action === "updateMany") {
+                        params.args.where = { ...params.args.where, tenantId };
+                    }
+                    else if (params.action === "delete" || params.action === "deleteMany") {
+                        params.args.where = { ...params.args.where, tenantId };
+                    }
+                }
+            }
+            return next(params);
+        });
+        console.log("✅ Prisma Client conectado ao PostgreSQL e middleware multi-tenant ativado.");
     }
     async onModuleDestroy() {
         await this.$disconnect();

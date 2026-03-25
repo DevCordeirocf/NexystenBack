@@ -67,7 +67,7 @@ export class ProductService {
     await this.findOne(id);
 
     return this.prisma.product.update({
-      where: { id },
+      where: { id, tenantId },
       data: updateProductDto,
     });
   }
@@ -82,7 +82,7 @@ export class ProductService {
     await this.findOne(id);
 
     return this.prisma.product.delete({
-      where: { id },
+      where: { id, tenantId },
     });
   }
 }

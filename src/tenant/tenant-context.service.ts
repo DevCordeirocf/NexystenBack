@@ -55,10 +55,6 @@ export class TenantContextService {
     const tenantId = this.getTenantId();
 
     if (!tenantId) {
-      // Usamos InternalServerErrorException (500) aqui, pois significa que
-      // nosso Interceptor ou Guard falhou em iniciar o contexto.
-      // Em um cenário real, você pode querer um erro 403/401 se for um problema de autorização.
-      // Mas para garantir o isolamento, trataremos como falha de contexto.
       throw new InternalServerErrorException('Falha de contexto multi-tenant: Tenant ID não disponível para esta operação.');
     }
 

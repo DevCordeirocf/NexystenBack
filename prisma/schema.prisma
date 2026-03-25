@@ -3,6 +3,7 @@ generator client {
 }
 
 datasource db {
+  url      = env("DATABASE_URL")
   provider = "postgresql"
   // Connection URLs are no longer supported in schema files.
   // Move the DATABASE_URL to prisma.config.ts or pass `adapter` / `accelerateUrl`
@@ -10,15 +11,37 @@ datasource db {
   // https://pris.ly/d/config-datasource and https://pris.ly/d/prisma7-client-config
 }
 
-model TenantStore {
+enum UserRole {
+  MASTER_ADMIN
+  TENANT_ADMIN
+  CUSTOMER // Para futuras funcionalidades de cliente logado, se necessário
+}
+
+model User {
   id        String   @id @default(uuid())
-  name      String   @unique
-  isActive  Boolean  @default(true)
+  email     String   @unique
+  password  String
+  role      UserRole @default(CUSTOMER) // Papel do usuário
+  tenantId  String? // Opcional: para TENANT_ADMIN, referencia o TenantStore
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tenant TenantStore? @relation(name: "TenantAdmins", fields: [tenantId], references: [id])
+
+  @@map("users")
+}
+
+model TenantStore {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  themeConfig Json? // Configurações de tema em formato JSON
+
   products        Product[]
   contactRequests ContactRequest[]
+  admins          User[]           @relation(name: "TenantAdmins") // Relação para administradores do tenant
 
   @@map("tenant_stores")
 }
@@ -31,7 +54,7 @@ model Product {
   price          Decimal  @db.Decimal(10, 2)
   isAvailable    Boolean  @default(true)
   images         String[] // URLs das imagens
-  specifications Json?    // JSON flexível para especificações
+  specifications Json? // JSON flexível para especificações
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

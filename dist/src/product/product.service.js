@@ -53,7 +53,7 @@ let ProductService = class ProductService {
         const tenantId = this.tenantContextService.getRequiredTenantId();
         await this.findOne(id);
         return this.prisma.product.update({
-            where: { id },
+            where: { id, tenantId },
             data: updateProductDto,
         });
     }
@@ -61,7 +61,7 @@ let ProductService = class ProductService {
         const tenantId = this.tenantContextService.getRequiredTenantId();
         await this.findOne(id);
         return this.prisma.product.delete({
-            where: { id },
+            where: { id, tenantId },
         });
     }
 };

@@ -10,10 +10,14 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const core_1 = require("@nestjs/core");
+const tenant_interceptor_1 = require("./tenant/tenant.interceptor");
 const prisma_module_1 = require("./database/prisma.module");
 const tenant_module_1 = require("./tenant/tenant.module");
 const product_module_1 = require("./product/product.module");
 const contact_request_module_1 = require("./contact-request/contact-request.module");
+const auth_module_1 = require("./auth/auth.module");
+const tenant_admin_module_1 = require("./tenant-admin/tenant-admin.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -24,9 +28,17 @@ exports.AppModule = AppModule = __decorate([
             prisma_module_1.PrismaModule,
             product_module_1.ProductModule,
             contact_request_module_1.ContactRequestModule,
+            auth_module_1.AuthModule,
+            tenant_admin_module_1.TenantAdminModule,
         ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        providers: [
+            app_service_1.AppService,
+            {
+                provide: core_1.APP_INTERCEPTOR,
+                useClass: tenant_interceptor_1.TenantInterceptor,
+            },
+        ],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map
