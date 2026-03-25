@@ -86,13 +86,13 @@ let TenantAdminService = class TenantAdminService {
     }
     async findAll() {
         return this.prisma.tenantStore.findMany({
-            include: { admins: { select: { id: true, email: true } } },
+            include: { users: { select: { id: true, email: true } } },
         });
     }
     async findOne(id) {
         const tenant = await this.prisma.tenantStore.findUnique({
             where: { id },
-            include: { admins: { select: { id: true, email: true } } },
+            include: { users: { select: { id: true, email: true } } },
         });
         if (!tenant) {
             throw new common_1.NotFoundException(`Tenant with ID ${id} not found.`);

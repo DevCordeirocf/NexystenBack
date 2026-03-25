@@ -5,4 +5,5 @@ export declare class CreateProductDto {
     images: string[];
     specifications?: Record<string, any>;
     isAvailable?: boolean;
+    categoryIds?: string[];
 }

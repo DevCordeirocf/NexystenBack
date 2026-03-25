@@ -1,6 +1,9 @@
 import { IsString, IsEmail, IsOptional, IsUUID } from 'class-validator';
 
 export class CreateContactRequestDto {
+  @IsOptional()
+  @IsUUID()
+  userId?: string;
   @IsUUID()
   productId!: string;
 

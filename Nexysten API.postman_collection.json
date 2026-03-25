@@ -8,6 +8,98 @@
   },
   "item": [
     {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"{{userEmail}}\",\n    \"password\": \"{{userPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar Admin (Super/Tenant)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@exemplo.com\",\n    \"password\": \"senha123\",\n    \"role\": \"TENANT_ADMIN\",\n    \"tenantId\": \"{{tenantId}}\",\n    \"name\": \"Admin da Loja\",\n    \"phone\": \"11999999999\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar Cliente (Lead)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant-ID",
+                "value": "{{tenantId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"cliente@exemplo.com\",\n    \"password\": \"senha123\",\n    \"name\": \"João Cliente\",\n    \"phone\": \"11988888888\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register-customer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register-customer"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Tenant Admin",
       "item": [
         {
@@ -38,6 +130,16 @@
               "path": [
                 "tenant-admin"
               ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
             }
           },
           "response": []
@@ -60,6 +162,16 @@
               ],
               "path": [
                 "tenant-admin"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
               ]
             }
           },
@@ -89,6 +201,16 @@
                 {
                   "key": "id",
                   "value": "{{tenantId}}"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
                 }
               ]
             }
@@ -130,6 +252,16 @@
                   "value": "{{tenantId}}"
                 }
               ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
             }
           },
           "response": []
@@ -158,6 +290,145 @@
                 {
                   "key": "id",
                   "value": "{{tenantId}}"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Categorias",
+      "item": [
+        {
+          "name": "Criar Categoria",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant-ID",
+                "value": "{{tenantId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Anéis de Noivado\",\n    \"description\": \"Categorias para anéis de noivado e casamento\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Categorias",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-ID",
+                "value": "{{tenantId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Upload",
+      "item": [
+        {
+          "name": "Upload de Imagem Única",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant-ID",
+                "value": "{{tenantId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/upload/image",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "upload",
+                "image"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
                 }
               ]
             }
@@ -227,6 +498,16 @@
               "path": [
                 "products"
               ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
             }
           },
           "response": []
@@ -244,7 +525,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Anel de Ouro 18k\",\n    \"description\": \"Anel elegante em ouro maciço\",\n    \"price\": 1500.00,\n    \"images\": [\n        \"https://exemplo.com/imagem1.jpg\"\n    ],\n    \"specifications\": {\n        \"material\": \"Ouro 18k\",\n        \"peso\": \"5g\"\n    },\n    \"isAvailable\": true\n}",
+              "raw": "{\n    \"name\": \"Anel de Ouro 18k\",\n    \"description\": \"Anel elegante em ouro maciço\",\n    \"price\": 1500.00,\n    \"images\": [\n        \"/uploads/exemplo.jpg\"\n    ],\n    \"specifications\": {\n        \"material\": \"Ouro 18k\",\n        \"peso\": \"5g\"\n    },\n    \"isAvailable\": true,\n    \"categoryIds\": [\"{{categoryId}}\"]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -258,6 +539,16 @@
               ],
               "path": [
                 "products"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
               ]
             }
           },
@@ -287,6 +578,16 @@
                 {
                   "key": "id",
                   "value": "id-do-produto"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
                 }
               ]
             }
@@ -328,6 +629,16 @@
                   "value": "id-do-produto"
                 }
               ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
             }
           },
           "response": []
@@ -358,6 +669,16 @@
                   "value": "id-do-produto"
                 }
               ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
             }
           },
           "response": []
@@ -386,6 +707,16 @@
               "path": [
                 "contact-requests"
               ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
             }
           },
           "response": []
@@ -403,7 +734,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"productId\": \"uuid-do-produto\",\n    \"customerName\": \"João Silva\",\n    \"customerEmail\": \"joao@exemplo.com\",\n    \"customerPhone\": \"11999999999\",\n    \"message\": \"Gostaria de saber mais sobre este produto.\"\n}",
+              "raw": "{\n    \"productId\": \"{{productId}}\",\n    \"customerName\": \"João Silva\",\n    \"customerEmail\": \"joao@email.com\",\n    \"customerPhone\": \"11999999999\",\n    \"message\": \"Tenho interesse neste anel.\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -418,103 +749,14 @@
               "path": [
                 "contact-requests"
               ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Obter Solicitação",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "X-Tenant-ID",
-                "value": "{{tenantId}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/contact-requests/:id",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "contact-requests",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "id-da-solicitacao"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Atualizar Solicitação",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "X-Tenant-ID",
-                "value": "{{tenantId}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"message\": \"Nova mensagem atualizada\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
             },
-            "url": {
-              "raw": "{{baseUrl}}/contact-requests/:id",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "contact-requests",
-                ":id"
-              ],
-              "variable": [
+            "auth": {
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "id",
-                  "value": "id-da-solicitacao"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Deletar Solicitação",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "X-Tenant-ID",
-                "value": "{{tenantId}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/contact-requests/:id",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "contact-requests",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "id-da-solicitacao"
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
                 }
               ]
             }
@@ -524,30 +766,6 @@
       ]
     }
   ],
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "requests": {},
-        "exec": [
-          ""
-        ]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "requests": {},
-        "exec": [
-          ""
-        ]
-      }
-    }
-  ],
   "variable": [
     {
       "key": "baseUrl",
@@ -555,23 +773,43 @@
     },
     {
       "key": "tenantId",
-      "value": "seu-uuid-de-tenant-aqui"
+      "value": "id-do-tenant"
     },
     {
-        "key": "tenantName",
-        "value": "Minha Nova Loja"
+      "key": "tenantName",
+      "value": "Minha Joalheria"
     },
     {
-        "key": "tenantAdminEmail",
-        "value": "admin@novaloja.com"
+      "key": "tenantAdminEmail",
+      "value": "admin@joalheria.com"
     },
     {
-        "key": "tenantAdminPassword",
-        "value": "senha123"
+      "key": "tenantAdminPassword",
+      "value": "senha123"
     },
     {
-        "key": "tenantNameUpdated",
-        "value": "Minha Loja com Nome Atualizado"
+      "key": "tenantNameUpdated",
+      "value": "Joalheria Luxo"
+    },
+    {
+      "key": "productId",
+      "value": "id-do-produto"
+    },
+    {
+      "key": "userEmail",
+      "value": "admin@exemplo.com"
+    },
+    {
+      "key": "userPassword",
+      "value": "senha123"
+    },
+    {
+      "key": "authToken",
+      "value": ""
+    },
+    {
+      "key": "categoryId",
+      "value": "id-da-categoria"
     }
   ]
 }

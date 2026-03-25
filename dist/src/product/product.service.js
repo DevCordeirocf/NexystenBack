@@ -22,17 +22,27 @@ let ProductService = class ProductService {
     }
     async create(createProductDto) {
         const tenantId = this.tenantContextService.getRequiredTenantId();
+        const { categoryIds, ...productData } = createProductDto;
         return this.prisma.product.create({
             data: {
-                ...createProductDto,
+                ...productData,
                 tenantId,
+                categories: categoryIds ? {
+                    connect: categoryIds.map(id => ({ id }))
+                } : undefined,
             },
+            include: {
+                categories: true
+            }
         });
     }
     async findAll() {
         const tenantId = this.tenantContextService.getRequiredTenantId();
         return this.prisma.product.findMany({
             where: { tenantId },
+            include: {
+                categories: true
+            },
             orderBy: { createdAt: 'desc' },
         });
     }
@@ -43,6 +53,9 @@ let ProductService = class ProductService {
                 id,
                 tenantId,
             },
+            include: {
+                categories: true
+            }
         });
         if (!product) {
             throw new common_1.NotFoundException(`Produto com ID ${id} não encontrado.`);
@@ -51,10 +64,19 @@ let ProductService = class ProductService {
     }
     async update(id, updateProductDto) {
         const tenantId = this.tenantContextService.getRequiredTenantId();
+        const { categoryIds, ...productData } = updateProductDto;
         await this.findOne(id);
         return this.prisma.product.update({
             where: { id, tenantId },
-            data: updateProductDto,
+            data: {
+                ...productData,
+                categories: categoryIds ? {
+                    set: categoryIds.map(id => ({ id }))
+                } : undefined,
+            },
+            include: {
+                categories: true
+            }
         });
     }
     async remove(id) {

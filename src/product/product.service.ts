@@ -16,12 +16,19 @@ export class ProductService {
    */
   async create(createProductDto: CreateProductDto) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
+    const { categoryIds, ...productData } = createProductDto;
 
     return this.prisma.product.create({
       data: {
-        ...createProductDto,
+        ...productData,
         tenantId,
+        categories: categoryIds ? {
+          connect: categoryIds.map(id => ({ id }))
+        } : undefined,
       },
+      include: {
+        categories: true
+      }
     });
   }
 
@@ -33,6 +40,9 @@ export class ProductService {
 
     return this.prisma.product.findMany({
       where: { tenantId },
+      include: {
+        categories: true
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -48,6 +58,9 @@ export class ProductService {
         id,
         tenantId,
       },
+      include: {
+        categories: true
+      }
     });
 
     if (!product) {
@@ -62,13 +75,22 @@ export class ProductService {
    */
   async update(id: string, updateProductDto: UpdateProductDto) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
+    const { categoryIds, ...productData } = updateProductDto;
 
     // Verificar se o produto existe e pertence ao tenant
     await this.findOne(id);
 
     return this.prisma.product.update({
       where: { id, tenantId },
-      data: updateProductDto,
+      data: {
+        ...productData,
+        categories: categoryIds ? {
+          set: categoryIds.map(id => ({ id }))
+        } : undefined,
+      },
+      include: {
+        categories: true
+      }
     });
   }
 

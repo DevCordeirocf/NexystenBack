@@ -7,8 +7,8 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
 
-// @UseGuards(JwtAuthGuard, RolesGuard)
-// @Roles(UserRole.MASTER_ADMIN)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.MASTER_ADMIN)
 @Controller('tenant-admin')
 export class TenantAdminController {
   constructor(private readonly tenantAdminService: TenantAdminService) {}

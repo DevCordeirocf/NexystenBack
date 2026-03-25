@@ -5,51 +5,51 @@ export declare class TenantAdminService {
     private readonly prisma;
     constructor(prisma: PrismaService);
     create(createTenantDto: CreateTenantDto): Promise<{
+        name: string;
         id: string;
         createdAt: Date;
-        name: string;
         updatedAt: Date;
         isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
     }>;
     findAll(): Promise<({
-        admins: {
+        users: {
             id: string;
             email: string;
         }[];
     } & {
+        name: string;
         id: string;
         createdAt: Date;
-        name: string;
         updatedAt: Date;
         isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
     })[]>;
     findOne(id: string): Promise<{
-        admins: {
+        users: {
             id: string;
             email: string;
         }[];
     } & {
+        name: string;
         id: string;
         createdAt: Date;
-        name: string;
         updatedAt: Date;
         isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
     }>;
     update(id: string, updateTenantDto: UpdateTenantDto): Promise<{
+        name: string;
         id: string;
         createdAt: Date;
-        name: string;
         updatedAt: Date;
         isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
     }>;
     remove(id: string): Promise<{
+        name: string;
         id: string;
         createdAt: Date;
-        name: string;
         updatedAt: Date;
         isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;

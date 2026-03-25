@@ -9,7 +9,9 @@ import { TenantModule } from './tenant/tenant.module';
 import { ProductModule } from './product/product.module';
 import { ContactRequestModule } from './contact-request/contact-request.module';
 import { AuthModule } from './auth/auth.module';
-import { TenantAdminModule } from './tenant-admin/tenant-admin.module'; 
+import { TenantAdminModule } from './tenant-admin/tenant-admin.module';
+import { CategoryModule } from './category/category.module';
+import { UploadModule } from './upload/upload.module'; 
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { TenantAdminModule } from './tenant-admin/tenant-admin.module';
     ContactRequestModule,
     AuthModule,
     TenantAdminModule,
+    CategoryModule,
+    UploadModule,
   ],
   controllers: [AppController], 
   providers: [

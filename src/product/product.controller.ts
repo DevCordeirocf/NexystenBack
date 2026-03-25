@@ -18,7 +18,7 @@ import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -28,7 +28,7 @@ export class ProductController {
    * Criar um novo produto
    */
   @Post()
-  // @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
+  @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto);
@@ -59,7 +59,7 @@ export class ProductController {
    * Atualizar um produto
    */
   @Patch(":id")
-  // @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
+  @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(id, updateProductDto);
   }
@@ -69,7 +69,7 @@ export class ProductController {
    * Deletar um produto
    */
   @Delete(":id")
-  // @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
+  @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
     return this.productService.remove(id);

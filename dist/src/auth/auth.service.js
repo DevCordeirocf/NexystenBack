@@ -56,7 +56,7 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async register(registerUserDto) {
-        const { email, password, role, tenantId } = registerUserDto;
+        const { email, password, role, tenantId, name, phone } = registerUserDto;
         const existingUser = await this.prisma.user.findUnique({ where: { email } });
         if (existingUser) {
             throw new common_1.BadRequestException('User with this email already exists.');
@@ -68,26 +68,46 @@ let AuthService = class AuthService {
         if (role === client_1.UserRole.TENANT_ADMIN && !tenantId) {
             throw new common_1.BadRequestException('TENANT_ADMIN must be assigned to a tenant.');
         }
-        if (role === client_1.UserRole.CUSTOMER && tenantId) {
-            throw new common_1.BadRequestException('CUSTOMER cannot be assigned to a specific tenant.');
-        }
         const user = await this.prisma.user.create({
             data: {
                 email,
                 password: hashedPassword,
                 role: role || client_1.UserRole.CUSTOMER,
-                tenantId: role === client_1.UserRole.TENANT_ADMIN ? tenantId : null,
+                tenantId: (role === client_1.UserRole.TENANT_ADMIN || role === client_1.UserRole.CUSTOMER) ? tenantId : null,
+                name,
+                phone,
             },
         });
         if (role === client_1.UserRole.TENANT_ADMIN && tenantId) {
             await this.prisma.tenantStore.update({
                 where: { id: tenantId },
                 data: {
-                    admins: { connect: { id: user.id } },
+                    users: { connect: { id: user.id } },
                 },
             });
         }
         return { message: 'User registered successfully' };
+    }
+    async registerCustomer(registerCustomerDto, tenantId) {
+        const { email, password, name, phone } = registerCustomerDto;
+        const existingUser = await this.prisma.user.findFirst({
+            where: { email, tenantId },
+        });
+        if (existingUser) {
+            throw new common_1.BadRequestException('Customer with this email already exists for this tenant.');
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await this.prisma.user.create({
+            data: {
+                email,
+                password: hashedPassword,
+                role: client_1.UserRole.CUSTOMER,
+                tenantId,
+                name,
+                phone,
+            },
+        });
+        return { message: 'Customer registered successfully', userId: user.id };
     }
     async login(loginUserDto) {
         const { email, password } = loginUserDto;

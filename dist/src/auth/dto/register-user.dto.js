@@ -15,6 +15,8 @@ const client_1 = require("@prisma/client");
 class RegisterUserDto {
     email;
     password;
+    name;
+    phone;
     role;
     tenantId;
 }
@@ -28,6 +30,16 @@ __decorate([
     (0, class_validator_1.MinLength)(6, { message: 'Password must be at least 6 characters long' }),
     __metadata("design:type", String)
 ], RegisterUserDto.prototype, "password", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterUserDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsPhoneNumber)('BR'),
+    __metadata("design:type", String)
+], RegisterUserDto.prototype, "phone", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEnum)(client_1.UserRole),

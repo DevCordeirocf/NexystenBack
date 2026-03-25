@@ -49,6 +49,14 @@ export class ContactRequestService {
       where: { tenantId },
       include: {
         product: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            phone: true,
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -67,6 +75,14 @@ export class ContactRequestService {
       },
       include: {
         product: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            phone: true,
+          },
+        },
       },
     });
 

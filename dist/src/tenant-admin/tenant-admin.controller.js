@@ -17,6 +17,10 @@ const common_1 = require("@nestjs/common");
 const tenant_admin_service_1 = require("./tenant-admin.service");
 const create_tenant_dto_1 = require("./dto/create-tenant.dto");
 const update_tenant_dto_1 = require("./dto/update-tenant.dto");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
+const roles_guard_1 = require("../auth/roles.guard");
+const roles_decorator_1 = require("../auth/roles.decorator");
+const client_1 = require("@prisma/client");
 let TenantAdminController = class TenantAdminController {
     tenantAdminService;
     constructor(tenantAdminService) {
@@ -77,6 +81,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], TenantAdminController.prototype, "remove", null);
 exports.TenantAdminController = TenantAdminController = __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN),
     (0, common_1.Controller)('tenant-admin'),
     __metadata("design:paramtypes", [tenant_admin_service_1.TenantAdminService])
 ], TenantAdminController);

@@ -48,14 +48,14 @@ export class TenantAdminService {
 
   async findAll() {
     return this.prisma.tenantStore.findMany({
-      include: { admins: { select: { id: true, email: true } } },
+      include: { users: { select: { id: true, email: true } } },
     });
   }
 
   async findOne(id: string) {
     const tenant = await this.prisma.tenantStore.findUnique({
       where: { id },
-      include: { admins: { select: { id: true, email: true } } },
+      include: { users: { select: { id: true, email: true } } },
     });
     if (!tenant) {
       throw new NotFoundException(`Tenant with ID ${id} not found.`);
@@ -64,7 +64,7 @@ export class TenantAdminService {
   }
 
   async update(id: string, updateTenantDto: UpdateTenantDto) {
-    await this.findOne(id); // Check if tenant exists
+    await this.findOne(id); 
     return this.prisma.tenantStore.update({
       where: { id },
       data: updateTenantDto,
@@ -72,7 +72,7 @@ export class TenantAdminService {
   }
 
   async remove(id: string) {
-    await this.findOne(id); // Check if tenant exists
+    await this.findOne(id);
     return this.prisma.tenantStore.delete({ where: { id } });
   }
 }

@@ -44,6 +44,14 @@ let ContactRequestService = class ContactRequestService {
             where: { tenantId },
             include: {
                 product: true,
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        name: true,
+                        phone: true,
+                    },
+                },
             },
             orderBy: { createdAt: 'desc' },
         });
@@ -57,6 +65,14 @@ let ContactRequestService = class ContactRequestService {
             },
             include: {
                 product: true,
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        name: true,
+                        phone: true,
+                    },
+                },
             },
         });
         if (!contactRequest) {

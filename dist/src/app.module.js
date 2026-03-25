@@ -18,6 +18,8 @@ const product_module_1 = require("./product/product.module");
 const contact_request_module_1 = require("./contact-request/contact-request.module");
 const auth_module_1 = require("./auth/auth.module");
 const tenant_admin_module_1 = require("./tenant-admin/tenant-admin.module");
+const category_module_1 = require("./category/category.module");
+const upload_module_1 = require("./upload/upload.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -30,6 +32,8 @@ exports.AppModule = AppModule = __decorate([
             contact_request_module_1.ContactRequestModule,
             auth_module_1.AuthModule,
             tenant_admin_module_1.TenantAdminModule,
+            category_module_1.CategoryModule,
+            upload_module_1.UploadModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

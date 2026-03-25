@@ -5,28 +5,27 @@ generator client {
 datasource db {
   url      = env("DATABASE_URL")
   provider = "postgresql"
-  // Connection URLs are no longer supported in schema files.
-  // Move the DATABASE_URL to prisma.config.ts or pass `adapter` / `accelerateUrl`
-  // when constructing PrismaClient as described in:
-  // https://pris.ly/d/config-datasource and https://pris.ly/d/prisma7-client-config
 }
 
 enum UserRole {
   MASTER_ADMIN
   TENANT_ADMIN
-  CUSTOMER // Para futuras funcionalidades de cliente logado, se necessário
+  CUSTOMER
 }
 
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
-  role      UserRole @default(CUSTOMER) // Papel do usuário
-  tenantId  String? // Opcional: para TENANT_ADMIN, referencia o TenantStore
+  name      String?
+  phone     String?
+  role      UserRole @default(CUSTOMER)
+  tenantId  String?  // Para TENANT_ADMIN e CUSTOMER, vincula ao TenantStore
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tenant TenantStore? @relation(name: "TenantAdmins", fields: [tenantId], references: [id])
+  tenant          TenantStore?     @relation(name: "TenantUsers", fields: [tenantId], references: [id])
+  contactRequests ContactRequest[] @relation(name: "UserContactRequests")
 
   @@map("users")
 }
@@ -37,13 +36,30 @@ model TenantStore {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  themeConfig Json? // Configurações de tema em formato JSON
+  themeConfig Json?    // Configurações de tema em formato JSON
 
   products        Product[]
+  categories      Category[]
   contactRequests ContactRequest[]
-  admins          User[]           @relation(name: "TenantAdmins") // Relação para administradores do tenant
+  users           User[]           @relation(name: "TenantUsers")
 
   @@map("tenant_stores")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant   TenantStore @relation(fields: [tenantId], references: [id])
+  products Product[]   @relation("ProductCategories")
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+  @@map("categories")
 }
 
 model Product {
@@ -54,11 +70,12 @@ model Product {
   price          Decimal  @db.Decimal(10, 2)
   isAvailable    Boolean  @default(true)
   images         String[] // URLs das imagens
-  specifications Json? // JSON flexível para especificações
+  specifications Json?    // JSON flexível para especificações
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   tenant          TenantStore      @relation(fields: [tenantId], references: [id])
+  categories      Category[]       @relation("ProductCategories")
   contactRequests ContactRequest[]
 
   @@unique([tenantId, name])
@@ -70,6 +87,7 @@ model ContactRequest {
   id            String   @id @default(uuid())
   tenantId      String
   productId     String
+  userId        String?  // Opcional: vincula ao usuário logado (CUSTOMER)
   customerName  String
   customerEmail String
   customerPhone String?
@@ -79,8 +97,10 @@ model ContactRequest {
 
   tenant  TenantStore @relation(fields: [tenantId], references: [id])
   product Product     @relation(fields: [productId], references: [id])
+  user    User?       @relation(name: "UserContactRequests", fields: [userId], references: [id])
 
   @@index([tenantId])
   @@index([productId])
+  @@index([userId])
   @@map("contact_requests")
 }
