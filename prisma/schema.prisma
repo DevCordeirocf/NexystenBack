@@ -37,6 +37,8 @@ model TenantStore {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   themeConfig Json?    // Configurações de tema em formato JSON
+  logoUrl     String?  // URL da logo da loja
+  whatsapp    String?  // Número de WhatsApp para contato
 
   products        Product[]
   categories      Category[]
@@ -68,7 +70,8 @@ model Product {
   name           String
   description    String
   price          Decimal  @db.Decimal(10, 2)
-  isAvailable    Boolean  @default(true)
+  stock          Int      @default(1) // Quantidade em estoque (1 para itens únicos como imóveis)
+  isActive       Boolean  @default(true) // Se o produto está ativo na vitrine
   images         String[] // URLs das imagens
   specifications Json?    // JSON flexível para especificações
   createdAt      DateTime @default(now())

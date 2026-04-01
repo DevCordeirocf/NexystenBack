@@ -18,15 +18,15 @@ class CreateCategoryDto {
 }
 exports.CreateCategoryDto = CreateCategoryDto;
 __decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.MaxLength)(100),
+    (0, class_validator_1.IsString)({ message: 'O nome da categoria deve ser uma string.' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'O nome da categoria não pode ser vazio.' }),
+    (0, class_validator_1.MaxLength)(100, { message: 'O nome da categoria não pode ter mais de 100 caracteres.' }),
     __metadata("design:type", String)
 ], CreateCategoryDto.prototype, "name", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsString)({ message: 'A descrição da categoria deve ser uma string.' }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.MaxLength)(500),
+    (0, class_validator_1.MaxLength)(500, { message: 'A descrição da categoria não pode ter mais de 500 caracteres.' }),
     __metadata("design:type", String)
 ], CreateCategoryDto.prototype, "description", void 0);
 //# sourceMappingURL=create-category.dto.js.map

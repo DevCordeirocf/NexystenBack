@@ -17,7 +17,7 @@ let PrismaService = class PrismaService extends client_1.PrismaClient {
     tenantContextService;
     constructor(tenantContextService) {
         super({
-            log: ['query', 'info', 'warn', 'error'],
+            log: ['error', 'warn'],
         });
         this.tenantContextService = tenantContextService;
     }
@@ -26,27 +26,19 @@ let PrismaService = class PrismaService extends client_1.PrismaClient {
         this.$use(async (params, next) => {
             const tenantId = this.tenantContextService.getTenantId();
             if (tenantId) {
-                if (params.model && ["Product", "ContactRequest"].includes(params.model)) {
-                    if (params.action === "findUnique" || params.action === "findFirst") {
-                        params.args.where = { ...params.args.where, tenantId };
-                    }
-                    else if (params.action === "findMany" || params.action === "count") {
+                const modelsToIsolate = ["Product", "ContactRequest", "Category"];
+                if (params.model && modelsToIsolate.includes(params.model)) {
+                    if (["findUnique", "findFirst", "findMany", "count", "update", "updateMany", "delete", "deleteMany"].includes(params.action)) {
                         params.args.where = { ...params.args.where, tenantId };
                     }
                     else if (params.action === "create") {
                         params.args.data = { ...params.args.data, tenantId };
                     }
-                    else if (params.action === "update" || params.action === "updateMany") {
-                        params.args.where = { ...params.args.where, tenantId };
-                    }
-                    else if (params.action === "delete" || params.action === "deleteMany") {
-                        params.args.where = { ...params.args.where, tenantId };
-                    }
                 }
             }
             return next(params);
         });
-        console.log("✅ Prisma Client conectado ao PostgreSQL e middleware multi-tenant ativado.");
+        console.log("✅ Banco de Dados conectado e isolamento Multi-tenant ativado.");
     }
     async onModuleDestroy() {
         await this.$disconnect();

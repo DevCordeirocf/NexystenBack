@@ -20,7 +20,9 @@ const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const roles_guard_1 = require("../auth/roles.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
 const client_1 = require("@prisma/client");
+const get_user_decorator_1 = require("../auth/get-user.decorator");
 const update_product_dto_1 = require("./dto/update-product.dto");
+const update_stock_availability_dto_1 = require("./dto/update-stock-availability.dto");
 let ProductController = class ProductController {
     productService;
     constructor(productService) {
@@ -29,14 +31,18 @@ let ProductController = class ProductController {
     create(createProductDto) {
         return this.productService.create(createProductDto);
     }
-    findAll() {
-        return this.productService.findAll();
+    findAll(categoryId, user) {
+        return this.productService.findAll(categoryId, user?.role);
     }
     findOne(id) {
         return this.productService.findOne(id);
     }
     update(id, updateProductDto) {
         return this.productService.update(id, updateProductDto);
+    }
+    updateStockAndAvailability(id, updateStockAvailabilityDto) {
+        const { stock, isActive } = updateStockAvailabilityDto;
+        return this.productService.updateStockAndAvailability(id, stock, isActive);
     }
     remove(id) {
         return this.productService.remove(id);
@@ -54,19 +60,23 @@ __decorate([
 ], ProductController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN, client_1.UserRole.TENANT_ADMIN, client_1.UserRole.CUSTOMER),
+    __param(0, (0, common_1.Query)('categoryId')),
+    __param(1, (0, get_user_decorator_1.GetUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], ProductController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(":id"),
+    (0, common_1.Get)(':id'),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN, client_1.UserRole.TENANT_ADMIN, client_1.UserRole.CUSTOMER),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ProductController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.Patch)(":id"),
+    (0, common_1.Patch)(':id'),
     (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN, client_1.UserRole.TENANT_ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -75,7 +85,16 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProductController.prototype, "update", null);
 __decorate([
-    (0, common_1.Delete)(":id"),
+    (0, common_1.Patch)(':id/stock-availability'),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN, client_1.UserRole.TENANT_ADMIN),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_stock_availability_dto_1.UpdateStockAvailabilityDto]),
+    __metadata("design:returntype", void 0)
+], ProductController.prototype, "updateStockAndAvailability", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
     (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN, client_1.UserRole.TENANT_ADMIN),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Param)('id')),

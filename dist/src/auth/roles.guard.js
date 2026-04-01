@@ -26,8 +26,17 @@ let RolesGuard = class RolesGuard {
         if (!requiredRoles) {
             return true;
         }
-        const { user } = context.switchToHttp().getRequest();
-        return requiredRoles.some((role) => user.role === role);
+        const req = context.switchToHttp().getRequest();
+        const user = req.user;
+        if (!user) {
+            throw new common_1.UnauthorizedException('Usuário não autenticado');
+        }
+        const userRole = String(user.role);
+        const allowed = requiredRoles.map((r) => String(r)).includes(userRole);
+        if (!allowed) {
+            throw new common_1.ForbiddenException('Acesso negado: role insuficiente');
+        }
+        return true;
     }
 };
 exports.RolesGuard = RolesGuard;

@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { GetUser } from '../auth/get-user.decorator';
 import { ContactRequestService } from './contact-request.service';
@@ -47,8 +48,8 @@ export class ContactRequestController {
    */
   @Get()
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
-  findAll() {
-    return this.contactRequestService.findAll();
+  findAll(@Query('status') status?: string) {
+    return this.contactRequestService.findAll(status);
   }
 
   /**

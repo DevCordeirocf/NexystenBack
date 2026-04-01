@@ -15,17 +15,20 @@ class CreateTenantDto {
     name;
     isActive;
     themeConfig;
+    logoUrl;
+    whatsappNumber;
     adminEmail;
     adminPassword;
 }
 exports.CreateTenantDto = CreateTenantDto;
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsString)({ message: 'O nome do tenant deve ser uma string.' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'O nome do tenant não pode ser vazio.' }),
     __metadata("design:type", String)
 ], CreateTenantDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsBoolean)({ message: 'isActive deve ser um valor booleano.' }),
     __metadata("design:type", Boolean)
 ], CreateTenantDto.prototype, "isActive", void 0);
 __decorate([
@@ -33,14 +36,24 @@ __decorate([
     __metadata("design:type", Object)
 ], CreateTenantDto.prototype, "themeConfig", void 0);
 __decorate([
+    (0, class_validator_1.IsString)({ message: 'A URL da logo deve ser uma string.' }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsEmail)(),
+    __metadata("design:type", String)
+], CreateTenantDto.prototype, "logoUrl", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'O número do WhatsApp deve ser uma string.' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateTenantDto.prototype, "whatsappNumber", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEmail)({}, { message: 'O email do administrador deve ser um endereço de e-mail válido.' }),
     __metadata("design:type", String)
 ], CreateTenantDto.prototype, "adminEmail", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(6, { message: 'Admin password must be at least 6 characters long' }),
+    (0, class_validator_1.IsString)({ message: 'A senha do administrador deve ser uma string.' }),
+    (0, class_validator_1.MinLength)(6, { message: 'A senha do administrador deve ter no mínimo 6 caracteres.' }),
     __metadata("design:type", String)
 ], CreateTenantDto.prototype, "adminPassword", void 0);
 //# sourceMappingURL=create-tenant.dto.js.map

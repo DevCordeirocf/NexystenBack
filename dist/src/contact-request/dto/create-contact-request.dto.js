@@ -22,29 +22,29 @@ class CreateContactRequestDto {
 exports.CreateContactRequestDto = CreateContactRequestDto;
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsUUID)(),
+    (0, class_validator_1.IsUUID)("4", { message: "O userId deve ser um UUID válido." }),
     __metadata("design:type", String)
 ], CreateContactRequestDto.prototype, "userId", void 0);
 __decorate([
-    (0, class_validator_1.IsUUID)(),
+    (0, class_validator_1.IsUUID)("4", { message: "O productId deve ser um UUID válido." }),
     __metadata("design:type", String)
 ], CreateContactRequestDto.prototype, "productId", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsString)({ message: "O nome do cliente deve ser uma string." }),
     __metadata("design:type", String)
 ], CreateContactRequestDto.prototype, "customerName", void 0);
 __decorate([
-    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsEmail)({}, { message: "O email do cliente deve ser um endereço de e-mail válido." }),
     __metadata("design:type", String)
 ], CreateContactRequestDto.prototype, "customerEmail", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsString)({ message: "O telefone do cliente deve ser uma string." }),
     __metadata("design:type", String)
 ], CreateContactRequestDto.prototype, "customerPhone", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsString)({ message: "A mensagem deve ser uma string." }),
     __metadata("design:type", String)
 ], CreateContactRequestDto.prototype, "message", void 0);
 //# sourceMappingURL=create-contact-request.dto.js.map

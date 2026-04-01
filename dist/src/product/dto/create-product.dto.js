@@ -17,25 +17,26 @@ class CreateProductDto {
     price;
     images;
     specifications;
-    isAvailable;
+    stock;
+    isActive;
     categoryIds;
 }
 exports.CreateProductDto = CreateProductDto;
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsString)({ message: 'O nome do produto deve ser uma string.' }),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "name", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsString)({ message: 'A descrição do produto deve ser uma string.' }),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "description", void 0);
 __decorate([
-    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsNumber)({}, { message: 'O preço deve ser um número.' }),
     __metadata("design:type", Number)
 ], CreateProductDto.prototype, "price", void 0);
 __decorate([
-    (0, class_validator_1.IsArray)(),
-    (0, class_validator_1.IsString)({ each: true }),
+    (0, class_validator_1.IsArray)({ message: 'As imagens devem ser um array.' }),
+    (0, class_validator_1.IsString)({ each: true, message: 'Cada imagem deve ser uma URL em formato de string.' }),
     __metadata("design:type", Array)
 ], CreateProductDto.prototype, "images", void 0);
 __decorate([
@@ -44,13 +45,18 @@ __decorate([
 ], CreateProductDto.prototype, "specifications", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], CreateProductDto.prototype, "isAvailable", void 0);
+    (0, class_validator_1.IsNumber)({}, { message: 'O estoque deve ser um número.' }),
+    __metadata("design:type", Number)
+], CreateProductDto.prototype, "stock", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsArray)(),
-    (0, class_validator_1.IsString)({ each: true }),
+    (0, class_validator_1.IsBoolean)({ message: 'isActive deve ser um valor booleano.' }),
+    __metadata("design:type", Boolean)
+], CreateProductDto.prototype, "isActive", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)({ message: 'Os categoryIds devem ser um array.' }),
+    (0, class_validator_1.IsString)({ each: true, message: 'Cada categoryId deve ser um UUID em formato de string.' }),
     __metadata("design:type", Array)
 ], CreateProductDto.prototype, "categoryIds", void 0);
 //# sourceMappingURL=create-product.dto.js.map

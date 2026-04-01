@@ -53,10 +53,10 @@ let TenantAdminService = class TenantAdminService {
         this.prisma = prisma;
     }
     async create(createTenantDto) {
-        const { name, isActive, themeConfig, adminEmail, adminPassword } = createTenantDto;
+        const { name, isActive, themeConfig, logoUrl, whatsappNumber, adminEmail, adminPassword } = createTenantDto;
         const existingTenant = await this.prisma.tenantStore.findUnique({ where: { name } });
         if (existingTenant) {
-            throw new common_1.BadRequestException(`Tenant with name '${name}' already exists.`);
+            throw new common_1.BadRequestException(`Já existe uma loja cadastrada com o nome '${name}'.`);
         }
         return this.prisma.$transaction(async (prisma) => {
             const tenant = await prisma.tenantStore.create({
@@ -64,12 +64,14 @@ let TenantAdminService = class TenantAdminService {
                     name,
                     isActive,
                     themeConfig,
+                    logoUrl,
+                    whatsapp: whatsappNumber,
                 },
             });
             if (adminEmail && adminPassword) {
                 const existingAdminUser = await prisma.user.findUnique({ where: { email: adminEmail } });
                 if (existingAdminUser) {
-                    throw new common_1.BadRequestException(`User with email '${adminEmail}' already exists.`);
+                    throw new common_1.BadRequestException(`Já existe um usuário cadastrado com o e-mail '${adminEmail}'.`);
                 }
                 const hashedPassword = await bcrypt.hash(adminPassword, 10);
                 await prisma.user.create({
@@ -95,15 +97,20 @@ let TenantAdminService = class TenantAdminService {
             include: { users: { select: { id: true, email: true } } },
         });
         if (!tenant) {
-            throw new common_1.NotFoundException(`Tenant with ID ${id} not found.`);
+            throw new common_1.NotFoundException(`Loja com ID "${id}" não encontrada.`);
         }
         return tenant;
     }
     async update(id, updateTenantDto) {
+        const { logoUrl, whatsappNumber, ...dataToUpdate } = updateTenantDto;
         await this.findOne(id);
         return this.prisma.tenantStore.update({
             where: { id },
-            data: updateTenantDto,
+            data: {
+                ...dataToUpdate,
+                logoUrl,
+                whatsapp: whatsappNumber,
+            },
         });
     }
     async remove(id) {

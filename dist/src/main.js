@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const common_1 = require("@nestjs/common");
 const app_module_1 = require("./app.module");
+const http_exception_filter_1 = require("./shared/filters/http-exception.filter");
 const path_1 = require("path");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
@@ -19,27 +20,20 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
         transform: true,
     }));
+    app.useGlobalFilters(new http_exception_filter_1.HttpExceptionFilter());
     const port = process.env.PORT || 3000;
     await app.listen(port);
     console.log(`
 ╔════════════════════════════════════════════════════════════════╗
 ║                                                                ║
-║   NEXYSTEN MVP - Sistema SaaS Multi-tenant para Joias      ║
+║   NEXYSTEN MVP - Sistema SaaS Multi-tenant                     ║
 ║                                                                ║
 ║   ✅ Servidor iniciado com sucesso!                           ║
 ║   📍 URL: http://localhost:${port}                             ║
 ║   🔒 Isolamento Multi-tenant: ATIVO                           ║
 ║   📊 Banco de Dados: PostgreSQL (via Prisma)                  ║
 ║                                                                ║
-║   Endpoints disponíveis:                                       ║
-║   • GET  /                  - Mensagem de boas-vindas         ║
-║   • GET  /health            - Status da aplicação             ║
-║   • GET  /products          - Listar produtos                 ║
-║   • POST /products          - Criar produto                   ║
-║   • GET  /contact-requests  - Listar solicitações             ║
-║   • POST /contact-requests  - Criar solicitação               ║
-║                                                                ║
-║   ⚠️  Não esqueça de enviar o header:                          ║
+║   ⚠️  Header obrigatório para operações de Tenant:             ║
 ║   X-Tenant-ID: {uuid-do-seu-tenant}                           ║
 ║                                                                ║
 ╚════════════════════════════════════════════════════════════════╝

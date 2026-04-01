@@ -13,6 +13,7 @@ exports.ProductService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../database/prisma.service");
 const tenant_context_service_1 = require("../tenant/tenant-context.service");
+const client_1 = require("@prisma/client");
 let ProductService = class ProductService {
     prisma;
     tenantContextService;
@@ -21,25 +22,42 @@ let ProductService = class ProductService {
         this.tenantContextService = tenantContextService;
     }
     async create(createProductDto) {
-        const tenantId = this.tenantContextService.getRequiredTenantId();
-        const { categoryIds, ...productData } = createProductDto;
-        return this.prisma.product.create({
-            data: {
-                ...productData,
-                tenantId,
-                categories: categoryIds ? {
-                    connect: categoryIds.map(id => ({ id }))
-                } : undefined,
-            },
-            include: {
-                categories: true
-            }
-        });
+        try {
+            const tenantId = this.tenantContextService.getRequiredTenantId();
+            const { categoryIds, stock, isActive, ...productData } = createProductDto;
+            return await this.prisma.product.create({
+                data: {
+                    ...productData,
+                    stock: stock !== undefined ? stock : 1,
+                    isActive: isActive !== undefined ? isActive : true,
+                    tenantId,
+                    categories: categoryIds ? {
+                        connect: categoryIds.map(id => ({ id }))
+                    } : undefined,
+                },
+                include: {
+                    categories: true
+                }
+            });
+        }
+        catch (error) {
+            throw error;
+        }
     }
-    async findAll() {
+    async findAll(categoryId, userRole) {
         const tenantId = this.tenantContextService.getRequiredTenantId();
+        const where = {
+            tenantId,
+            categories: categoryId ? {
+                some: { id: categoryId }
+            } : undefined,
+        };
+        if (userRole === client_1.UserRole.CUSTOMER) {
+            where.isActive = true;
+            where.stock = { gt: 0 };
+        }
         return this.prisma.product.findMany({
-            where: { tenantId },
+            where,
             include: {
                 categories: true
             },
@@ -58,7 +76,7 @@ let ProductService = class ProductService {
             }
         });
         if (!product) {
-            throw new common_1.NotFoundException(`Produto com ID ${id} não encontrado.`);
+            throw new common_1.NotFoundException(`Produto com ID "${id}" não encontrado para este tenant.`);
         }
         return product;
     }
@@ -84,6 +102,24 @@ let ProductService = class ProductService {
         await this.findOne(id);
         return this.prisma.product.delete({
             where: { id, tenantId },
+        });
+    }
+    async updateStockAndAvailability(id, stock, isActive) {
+        const tenantId = this.tenantContextService.getRequiredTenantId();
+        await this.findOne(id);
+        const dataToUpdate = {};
+        if (stock !== undefined) {
+            dataToUpdate.stock = stock;
+        }
+        if (isActive !== undefined) {
+            dataToUpdate.isActive = isActive;
+        }
+        return this.prisma.product.update({
+            where: { id, tenantId },
+            data: dataToUpdate,
+            include: {
+                categories: true
+            }
         });
     }
 };

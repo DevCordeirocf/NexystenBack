@@ -8,111 +8,106 @@ export declare class ContactRequestController {
         id: string;
         createdAt: Date;
         tenantId: string;
-        userId: string | null;
-        productId: string;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
         message: string | null;
         status: string;
+        productId: string;
+        userId: string | null;
     }>;
-    findAll(): Promise<({
+    findAll(status?: string): Promise<({
         user: {
-            name: string | null;
             id: string;
+            name: string | null;
             email: string;
             phone: string | null;
         } | null;
         product: {
-            name: string;
-            description: string;
-            price: import("@prisma/client/runtime/library").Decimal;
-            images: string[];
-            specifications: import("@prisma/client/runtime/library").JsonValue | null;
-            isAvailable: boolean;
             id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            tenantId: string;
+            name: string;
+            images: string[];
         };
     } & {
         id: string;
         createdAt: Date;
         tenantId: string;
-        userId: string | null;
-        productId: string;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
         message: string | null;
         status: string;
+        productId: string;
+        userId: string | null;
     })[]>;
     findOne(id: string): Promise<{
         user: {
-            name: string | null;
             id: string;
+            name: string | null;
             email: string;
             phone: string | null;
         } | null;
         product: {
+            id: string;
             name: string;
             description: string;
-            price: import("@prisma/client/runtime/library").Decimal;
-            images: string[];
-            specifications: import("@prisma/client/runtime/library").JsonValue | null;
-            isAvailable: boolean;
-            id: string;
             createdAt: Date;
             updatedAt: Date;
             tenantId: string;
+            isActive: boolean;
+            price: import("@prisma/client/runtime/library").Decimal;
+            stock: number;
+            images: string[];
+            specifications: import("@prisma/client/runtime/library").JsonValue | null;
         };
     } & {
         id: string;
         createdAt: Date;
         tenantId: string;
-        userId: string | null;
-        productId: string;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
         message: string | null;
         status: string;
+        productId: string;
+        userId: string | null;
     }>;
     update(id: string, updateContactRequestDto: UpdateContactRequestDto): Promise<{
         product: {
+            id: string;
             name: string;
             description: string;
-            price: import("@prisma/client/runtime/library").Decimal;
-            images: string[];
-            specifications: import("@prisma/client/runtime/library").JsonValue | null;
-            isAvailable: boolean;
-            id: string;
             createdAt: Date;
             updatedAt: Date;
             tenantId: string;
+            isActive: boolean;
+            price: import("@prisma/client/runtime/library").Decimal;
+            stock: number;
+            images: string[];
+            specifications: import("@prisma/client/runtime/library").JsonValue | null;
         };
     } & {
         id: string;
         createdAt: Date;
         tenantId: string;
-        userId: string | null;
-        productId: string;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
         message: string | null;
         status: string;
+        productId: string;
+        userId: string | null;
     }>;
     remove(id: string): Promise<{
         id: string;
         createdAt: Date;
         tenantId: string;
-        userId: string | null;
-        productId: string;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
         message: string | null;
         status: string;
+        productId: string;
+        userId: string | null;
     }>;
 }

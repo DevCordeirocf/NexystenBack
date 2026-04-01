@@ -22,32 +22,32 @@ class RegisterUserDto {
 }
 exports.RegisterUserDto = RegisterUserDto;
 __decorate([
-    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsEmail)({}, { message: 'O email deve ser um endereço de e-mail válido.' }),
     __metadata("design:type", String)
 ], RegisterUserDto.prototype, "email", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(6, { message: 'Password must be at least 6 characters long' }),
+    (0, class_validator_1.IsString)({ message: 'A senha deve ser uma string.' }),
+    (0, class_validator_1.MinLength)(6, { message: 'A senha deve ter no mínimo 6 caracteres.' }),
     __metadata("design:type", String)
 ], RegisterUserDto.prototype, "password", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsString)({ message: 'O nome deve ser uma string.' }),
     __metadata("design:type", String)
 ], RegisterUserDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsPhoneNumber)('BR'),
+    (0, class_validator_1.IsPhoneNumber)('BR', { message: 'O telefone deve ser um número de telefone válido do Brasil.' }),
     __metadata("design:type", String)
 ], RegisterUserDto.prototype, "phone", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsEnum)(client_1.UserRole),
+    (0, class_validator_1.IsEnum)(client_1.UserRole, { message: 'A role deve ser MASTER_ADMIN, TENANT_ADMIN ou CUSTOMER.' }),
     __metadata("design:type", String)
 ], RegisterUserDto.prototype, "role", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsUUID)(),
+    (0, class_validator_1.IsUUID)('4', { message: 'O tenantId deve ser um UUID válido.' }),
     __metadata("design:type", String)
 ], RegisterUserDto.prototype, "tenantId", void 0);
 //# sourceMappingURL=register-user.dto.js.map

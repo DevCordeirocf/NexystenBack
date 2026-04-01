@@ -59,14 +59,14 @@ let AuthService = class AuthService {
         const { email, password, role, tenantId, name, phone } = registerUserDto;
         const existingUser = await this.prisma.user.findUnique({ where: { email } });
         if (existingUser) {
-            throw new common_1.BadRequestException('User with this email already exists.');
+            throw new common_1.BadRequestException('Já existe um usuário cadastrado com este e-mail.');
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         if (role === client_1.UserRole.MASTER_ADMIN && tenantId) {
-            throw new common_1.BadRequestException('MASTER_ADMIN cannot be assigned to a specific tenant.');
+            throw new common_1.BadRequestException('Um MASTER_ADMIN não pode ser vinculado a um tenant específico.');
         }
         if (role === client_1.UserRole.TENANT_ADMIN && !tenantId) {
-            throw new common_1.BadRequestException('TENANT_ADMIN must be assigned to a tenant.');
+            throw new common_1.BadRequestException('Um TENANT_ADMIN deve obrigatoriamente estar vinculado a um tenant.');
         }
         const user = await this.prisma.user.create({
             data: {
@@ -86,7 +86,7 @@ let AuthService = class AuthService {
                 },
             });
         }
-        return { message: 'User registered successfully' };
+        return { message: 'Usuário registrado com sucesso' };
     }
     async registerCustomer(registerCustomerDto, tenantId) {
         const { email, password, name, phone } = registerCustomerDto;
@@ -94,7 +94,7 @@ let AuthService = class AuthService {
             where: { email, tenantId },
         });
         if (existingUser) {
-            throw new common_1.BadRequestException('Customer with this email already exists for this tenant.');
+            throw new common_1.BadRequestException('Já existe um cliente cadastrado com este e-mail para esta loja.');
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await this.prisma.user.create({
@@ -107,19 +107,24 @@ let AuthService = class AuthService {
                 phone,
             },
         });
-        return { message: 'Customer registered successfully', userId: user.id };
+        return { message: 'Cliente registrado com sucesso', userId: user.id };
     }
     async login(loginUserDto) {
         const { email, password } = loginUserDto;
         const user = await this.prisma.user.findUnique({ where: { email } });
         if (!user) {
-            throw new common_1.UnauthorizedException('Invalid credentials.');
+            throw new common_1.UnauthorizedException('E-mail ou senha inválidos.');
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            throw new common_1.UnauthorizedException('Invalid credentials.');
+            throw new common_1.UnauthorizedException('E-mail ou senha inválidos.');
         }
-        const payload = { email: user.email, sub: user.id, role: user.role, tenantId: user.tenantId };
+        const payload = {
+            email: user.email,
+            sub: user.id,
+            role: user.role,
+            tenantId: user.tenantId
+        };
         return {
             access_token: this.jwtService.sign(payload),
         };

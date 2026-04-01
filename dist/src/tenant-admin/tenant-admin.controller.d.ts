@@ -5,12 +5,14 @@ export declare class TenantAdminController {
     private readonly tenantAdminService;
     constructor(tenantAdminService: TenantAdminService);
     create(createTenantDto: CreateTenantDto): Promise<{
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
+        logoUrl: string | null;
+        whatsapp: string | null;
     }>;
     findAll(): Promise<({
         users: {
@@ -18,12 +20,14 @@ export declare class TenantAdminController {
             email: string;
         }[];
     } & {
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
+        logoUrl: string | null;
+        whatsapp: string | null;
     })[]>;
     findOne(id: string): Promise<{
         users: {
@@ -31,27 +35,33 @@ export declare class TenantAdminController {
             email: string;
         }[];
     } & {
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
+        logoUrl: string | null;
+        whatsapp: string | null;
     }>;
     update(id: string, updateTenantDto: UpdateTenantDto): Promise<{
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
+        logoUrl: string | null;
+        whatsapp: string | null;
     }>;
     remove(id: string): Promise<{
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
+        logoUrl: string | null;
+        whatsapp: string | null;
     }>;
 }

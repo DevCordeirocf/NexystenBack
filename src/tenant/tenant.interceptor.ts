@@ -1,4 +1,4 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, ForbiddenException } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { TenantContextService } from './tenant-context.service';
 
@@ -9,24 +9,37 @@ export class TenantInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const tenantId = request.headers['x-tenant-id'] as string;
+    const url = request.url;
 
-    if (!tenantId) {
-      // Para rotas públicas que não exigem tenantId, podemos permitir que passem
-      // No entanto, para rotas protegidas, isso deve ser tratado por um Guard de autenticação/autorização
-      // Por enquanto, vamos forçar o tenantId para todas as rotas que usam este interceptor
+    // Lista de rotas que não exigem obrigatoriamente o X-Tenant-ID (ex: Login Global, Registro de Admin)
+    const isPublicRoute = url.includes('/auth/login') || 
+                         url.includes('/auth/register') || 
+                         url.includes('/tenant-admin');
+
+    if (!tenantId && !isPublicRoute) {
       throw new ForbiddenException('X-Tenant-ID header is required.');
     }
 
-    // Aqui, o tenantId do usuário autenticado (se houver) deveria ser validado contra o X-Tenant-ID
-    // Por enquanto, apenas definimos o contexto com o X-Tenant-ID
+    // Se não houver tenantId (como no caso do Master Admin), iniciamos o contexto como vazio ou nulo
+    // O TenantContextService deve ser capaz de lidar com isso
     return new Observable(subscriber => {
-      this.tenantContextService.run(tenantId, () => {
-        next.handle().subscribe({
-          next: (value) => subscriber.next(value),
-          error: (err) => subscriber.error(err),
-          complete: () => subscriber.complete(),
+      // Se houver tenantId, rodamos no contexto dele. Se não, rodamos sem contexto (para rotas globais)
+      if (tenantId) {
+        this.tenantContextService.run(tenantId, () => {
+          this.executeNext(next, subscriber);
         });
-      });
+      } else {
+        // Para rotas globais sem tenantId, apenas seguimos o fluxo
+        this.executeNext(next, subscriber);
+      }
+    });
+  }
+
+  private executeNext(next: CallHandler, subscriber: any) {
+    next.handle().subscribe({
+      next: (value) => subscriber.next(value),
+      error: (err) => subscriber.error(err),
+      complete: () => subscriber.complete(),
     });
   }
 }

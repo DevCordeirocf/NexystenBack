@@ -33,8 +33,8 @@ let ContactRequestController = class ContactRequestController {
         }
         return this.contactRequestService.create(createContactRequestDto);
     }
-    findAll() {
-        return this.contactRequestService.findAll();
+    findAll(status) {
+        return this.contactRequestService.findAll(status);
     }
     findOne(id) {
         return this.contactRequestService.findOne(id);
@@ -60,8 +60,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN, client_1.UserRole.TENANT_ADMIN),
+    __param(0, (0, common_1.Query)('status')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ContactRequestController.prototype, "findAll", null);
 __decorate([

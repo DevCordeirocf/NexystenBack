@@ -24,7 +24,7 @@ const client_1 = require("@prisma/client");
 let UploadController = class UploadController {
     uploadImage(file) {
         if (!file) {
-            throw new common_1.BadRequestException('File is required');
+            throw new common_1.BadRequestException('O arquivo é obrigatório');
         }
         return {
             url: `/uploads/${file.filename}`,
@@ -33,7 +33,7 @@ let UploadController = class UploadController {
     }
     uploadImages(files) {
         if (!files || files.length === 0) {
-            throw new common_1.BadRequestException('Files are required');
+            throw new common_1.BadRequestException('Os arquivos são obrigatórios');
         }
         return files.map((file) => ({
             url: `/uploads/${file.filename}`,
@@ -56,7 +56,7 @@ __decorate([
         }),
         fileFilter: (req, file, callback) => {
             if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
-                return callback(new common_1.BadRequestException('Only image files are allowed!'), false);
+                return callback(new common_1.BadRequestException('Apenas arquivos de imagem são permitidos!'), false);
             }
             callback(null, true);
         },
@@ -83,7 +83,7 @@ __decorate([
         }),
         fileFilter: (req, file, callback) => {
             if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
-                return callback(new common_1.BadRequestException('Only image files are allowed!'), false);
+                return callback(new common_1.BadRequestException('Apenas arquivos de imagem são permitidos!'), false);
             }
             callback(null, true);
         },

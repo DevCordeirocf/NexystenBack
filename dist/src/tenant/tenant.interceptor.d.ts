@@ -5,4 +5,5 @@ export declare class TenantInterceptor implements NestInterceptor {
     private readonly tenantContextService;
     constructor(tenantContextService: TenantContextService);
     intercept(context: ExecutionContext, next: CallHandler): Observable<any>;
+    private executeNext;
 }

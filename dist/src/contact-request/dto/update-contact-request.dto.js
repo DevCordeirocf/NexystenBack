@@ -13,11 +13,18 @@ exports.UpdateContactRequestDto = void 0;
 const class_validator_1 = require("class-validator");
 class UpdateContactRequestDto {
     status;
+    internalNotes;
 }
 exports.UpdateContactRequestDto = UpdateContactRequestDto;
 __decorate([
+    (0, class_validator_1.IsString)({ message: 'O status deve ser uma string.' }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsIn)(['PENDING', 'CONTACTED', 'CLOSED']),
+    (0, class_validator_1.IsIn)(['PENDING', 'CONTACTED', 'CLOSED'], { message: 'O status deve ser PENDING, CONTACTED ou CLOSED.' }),
     __metadata("design:type", String)
 ], UpdateContactRequestDto.prototype, "status", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'As notas internas devem ser uma string.' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateContactRequestDto.prototype, "internalNotes", void 0);
 //# sourceMappingURL=update-contact-request.dto.js.map

@@ -17,12 +17,12 @@ class LoginUserDto {
 }
 exports.LoginUserDto = LoginUserDto;
 __decorate([
-    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsEmail)({}, { message: 'O email deve ser um endereço de e-mail válido.' }),
     __metadata("design:type", String)
 ], LoginUserDto.prototype, "email", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(6, { message: 'Password must be at least 6 characters long' }),
+    (0, class_validator_1.IsString)({ message: 'A senha deve ser uma string.' }),
+    (0, class_validator_1.MinLength)(6, { message: 'A senha deve ter no mínimo 6 caracteres.' }),
     __metadata("design:type", String)
 ], LoginUserDto.prototype, "password", void 0);
 //# sourceMappingURL=login-user.dto.js.map

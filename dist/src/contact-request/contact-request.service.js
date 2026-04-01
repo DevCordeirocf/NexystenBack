@@ -29,7 +29,7 @@ let ContactRequestService = class ContactRequestService {
             },
         });
         if (!product) {
-            throw new common_1.NotFoundException(`Produto com ID ${createContactRequestDto.productId} não encontrado.`);
+            throw new common_1.NotFoundException(`Produto com ID "${createContactRequestDto.productId}" não encontrado para este tenant.`);
         }
         return this.prisma.contactRequest.create({
             data: {
@@ -38,12 +38,21 @@ let ContactRequestService = class ContactRequestService {
             },
         });
     }
-    async findAll() {
+    async findAll(status) {
         const tenantId = this.tenantContextService.getRequiredTenantId();
         return this.prisma.contactRequest.findMany({
-            where: { tenantId },
+            where: {
+                tenantId,
+                status: status ? status : undefined,
+            },
             include: {
-                product: true,
+                product: {
+                    select: {
+                        id: true,
+                        name: true,
+                        images: true,
+                    }
+                },
                 user: {
                     select: {
                         id: true,
@@ -76,7 +85,7 @@ let ContactRequestService = class ContactRequestService {
             },
         });
         if (!contactRequest) {
-            throw new common_1.NotFoundException(`Solicitação de contato com ID ${id} não encontrada.`);
+            throw new common_1.NotFoundException(`Solicitação de contato com ID "${id}" não encontrada para este tenant.`);
         }
         return contactRequest;
     }

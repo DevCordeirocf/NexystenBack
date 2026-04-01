@@ -12,12 +12,12 @@ export class ContactRequestService {
   ) {}
 
   /**
-   * Criar uma nova solicitação de contato
+   * Cria uma nova solicitação de contato (Lead) vinculada a um produto e tenant.
    */
   async create(createContactRequestDto: CreateContactRequestDto) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
 
-    // Verificar se o produto existe e pertence ao tenant
+    // Valida se o produto existe e pertence ao mesmo tenant da solicitação
     const product = await this.prisma.product.findFirst({
       where: {
         id: createContactRequestDto.productId,
@@ -27,7 +27,7 @@ export class ContactRequestService {
 
     if (!product) {
       throw new NotFoundException(
-        `Produto com ID ${createContactRequestDto.productId} não encontrado.`,
+        `Produto com ID "${createContactRequestDto.productId}" não encontrado para este tenant.`,
       );
     }
 
@@ -40,15 +40,25 @@ export class ContactRequestService {
   }
 
   /**
-   * Listar todas as solicitações de contato do tenant
+   * Lista todas as solicitações de contato do tenant atual.
+   * Permite filtrar por status (PENDING, CONTACTED, CLOSED).
    */
-  async findAll() {
+  async findAll(status?: string) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
 
     return this.prisma.contactRequest.findMany({
-      where: { tenantId },
+      where: { 
+        tenantId,
+        status: status ? status : undefined,
+      },
       include: {
-        product: true,
+        product: {
+          select: {
+            id: true,
+            name: true,
+            images: true,
+          }
+        },
         user: {
           select: {
             id: true,
@@ -63,7 +73,7 @@ export class ContactRequestService {
   }
 
   /**
-   * Obter uma solicitação de contato específica
+   * Busca os detalhes de uma solicitação de contato específica.
    */
   async findOne(id: string) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
@@ -88,7 +98,7 @@ export class ContactRequestService {
 
     if (!contactRequest) {
       throw new NotFoundException(
-        `Solicitação de contato com ID ${id} não encontrada.`,
+        `Solicitação de contato com ID "${id}" não encontrada para este tenant.`,
       );
     }
 
@@ -96,7 +106,7 @@ export class ContactRequestService {
   }
 
   /**
-   * Atualizar uma solicitação de contato
+   * Atualiza o status ou notas internas de uma solicitação de contato.
    */
   async update(
     id: string,
@@ -104,7 +114,7 @@ export class ContactRequestService {
   ) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
 
-    // Verificar se a solicitação existe e pertence ao tenant
+    // Garante que a solicitação existe e pertence ao tenant antes de atualizar
     await this.findOne(id);
 
     return this.prisma.contactRequest.update({
@@ -117,12 +127,12 @@ export class ContactRequestService {
   }
 
   /**
-   * Deletar uma solicitação de contato
+   * Remove uma solicitação de contato do sistema.
    */
   async remove(id: string) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
 
-    // Verificar se a solicitação existe e pertence ao tenant
+    // Garante que a solicitação existe e pertence ao tenant antes de remover
     await this.findOne(id);
 
     return this.prisma.contactRequest.delete({

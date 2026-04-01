@@ -15,20 +15,32 @@ class UpdateTenantDto {
     name;
     isActive;
     themeConfig;
+    logoUrl;
+    whatsappNumber;
 }
 exports.UpdateTenantDto = UpdateTenantDto;
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsString)({ message: 'O nome do tenant deve ser uma string.' }),
     __metadata("design:type", String)
 ], UpdateTenantDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsBoolean)({ message: 'isActive deve ser um valor booleano.' }),
     __metadata("design:type", Boolean)
 ], UpdateTenantDto.prototype, "isActive", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Object)
 ], UpdateTenantDto.prototype, "themeConfig", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'A URL da logo deve ser uma string.' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateTenantDto.prototype, "logoUrl", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'O número do WhatsApp deve ser uma string.' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateTenantDto.prototype, "whatsappNumber", void 0);
 //# sourceMappingURL=update-tenant.dto.js.map

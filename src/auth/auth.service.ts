@@ -14,24 +14,26 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
+  /**
+   * Registra um novo usuário no sistema (Admin ou Lojista)
+   */
   async register(registerUserDto: RegisterUserDto) {
     const { email, password, role, tenantId, name, phone } = registerUserDto;
 
     const existingUser = await this.prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      throw new BadRequestException('User with this email already exists.');
+      throw new BadRequestException('Já existe um usuário cadastrado com este e-mail.');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Role-based tenantId validation
+    // Validações de vínculo com Tenant baseadas na Role
     if (role === UserRole.MASTER_ADMIN && tenantId) {
-      throw new BadRequestException('MASTER_ADMIN cannot be assigned to a specific tenant.');
+      throw new BadRequestException('Um MASTER_ADMIN não pode ser vinculado a um tenant específico.');
     }
     if (role === UserRole.TENANT_ADMIN && !tenantId) {
-      throw new BadRequestException('TENANT_ADMIN must be assigned to a tenant.');
+      throw new BadRequestException('Um TENANT_ADMIN deve obrigatoriamente estar vinculado a um tenant.');
     }
-    // For CUSTOMERs, tenantId is optional. If provided, it links them to a specific store.
 
     const user = await this.prisma.user.create({
       data: {
@@ -44,19 +46,22 @@ export class AuthService {
       },
     });
 
-    // If a TENANT_ADMIN is created, link them to the TenantStore
+    // Vincula o administrador à loja correspondente
     if (role === UserRole.TENANT_ADMIN && tenantId) {
       await this.prisma.tenantStore.update({
         where: { id: tenantId },
         data: {
-          users: { connect: { id: user.id } }, // Changed from admins to users as per schema update
+          users: { connect: { id: user.id } },
         },
       });
     }
 
-    return { message: 'User registered successfully' };
+    return { message: 'Usuário registrado com sucesso' };
   }
 
+  /**
+   * Registra um cliente final vinculado a uma loja específica
+   */
   async registerCustomer(registerCustomerDto: RegisterCustomerDto, tenantId: string) {
     const { email, password, name, phone } = registerCustomerDto;
 
@@ -64,7 +69,7 @@ export class AuthService {
       where: { email, tenantId },
     });
     if (existingUser) {
-      throw new BadRequestException('Customer with this email already exists for this tenant.');
+      throw new BadRequestException('Já existe um cliente cadastrado com este e-mail para esta loja.');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -80,28 +85,40 @@ export class AuthService {
       },
     });
 
-    return { message: 'Customer registered successfully', userId: user.id };
+    return { message: 'Cliente registrado com sucesso', userId: user.id };
   }
 
+  /**
+   * Realiza a autenticação do usuário e gera o token JWT
+   */
   async login(loginUserDto: LoginUserDto) {
     const { email, password } = loginUserDto;
 
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials.');
+      throw new UnauthorizedException('E-mail ou senha inválidos.');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials.');
+      throw new UnauthorizedException('E-mail ou senha inválidos.');
     }
 
-    const payload = { email: user.email, sub: user.id, role: user.role, tenantId: user.tenantId };
+    const payload = { 
+      email: user.email, 
+      sub: user.id, 
+      role: user.role, 
+      tenantId: user.tenantId 
+    };
+
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
+  /**
+   * Valida o usuário a partir do payload do token
+   */
   async validateUser(payload: any) {
     return this.prisma.user.findUnique({ where: { id: payload.sub } });
   }

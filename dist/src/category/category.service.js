@@ -20,7 +20,7 @@ let CategoryService = class CategoryService {
     async create(createCategoryDto) {
         const { tenantId, ...data } = createCategoryDto;
         if (!tenantId) {
-            throw new Error("Tenant ID is required to create a category.");
+            throw new common_1.BadRequestException("O ID do Tenant é obrigatório para criar uma categoria.");
         }
         return this.prisma.category.create({
             data: {
@@ -44,20 +44,12 @@ let CategoryService = class CategoryService {
             },
         });
         if (!category) {
-            throw new common_1.NotFoundException(`Category with ID "${id}" not found for tenant "${tenantId}"`);
+            throw new common_1.NotFoundException(`Categoria com ID "${id}" não encontrada para este tenant.`);
         }
         return category;
     }
     async update(id, tenantId, updateCategoryDto) {
-        const category = await this.prisma.category.findUnique({
-            where: {
-                id,
-                tenantId: tenantId,
-            },
-        });
-        if (!category) {
-            throw new common_1.NotFoundException(`Category with ID "${id}" not found for tenant "${tenantId}"`);
-        }
+        await this.findOne(id, tenantId);
         return this.prisma.category.update({
             where: {
                 id,
@@ -67,15 +59,7 @@ let CategoryService = class CategoryService {
         });
     }
     async remove(id, tenantId) {
-        const category = await this.prisma.category.findUnique({
-            where: {
-                id,
-                tenantId: tenantId,
-            },
-        });
-        if (!category) {
-            throw new common_1.NotFoundException(`Category with ID "${id}" not found for tenant "${tenantId}"`);
-        }
+        await this.findOne(id, tenantId);
         return this.prisma.category.delete({
             where: {
                 id,

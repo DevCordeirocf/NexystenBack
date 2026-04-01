@@ -15,9 +15,18 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
 
+/**
+ * Controller responsável pelo upload de arquivos (imagens de produtos/imóveis).
+ * Protegido por autenticação e restrito a administradores.
+ */
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('upload')
 export class UploadController {
+  
+  /**
+   * Realiza o upload de uma única imagem.
+   * Limite de 5MB. Formatos aceitos: jpg, jpeg, png, gif, webp.
+   */
   @Post('image')
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   @UseInterceptors(
@@ -32,7 +41,7 @@ export class UploadController {
       }),
       fileFilter: (req, file, callback) => {
         if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
-          return callback(new BadRequestException('Only image files are allowed!'), false);
+          return callback(new BadRequestException('Apenas arquivos de imagem são permitidos!'), false);
         }
         callback(null, true);
       },
@@ -43,15 +52,19 @@ export class UploadController {
   )
   uploadImage(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
-      throw new BadRequestException('File is required');
+      throw new BadRequestException('O arquivo é obrigatório');
     }
-    // Retorna a URL relativa para acessar a imagem
+    
+    // Retorna a URL relativa para acesso estático à imagem
     return {
       url: `/uploads/${file.filename}`,
       filename: file.filename,
     };
   }
 
+  /**
+   * Realiza o upload de múltiplas imagens (até 10 por vez).
+   */
   @Post('images')
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   @UseInterceptors(
@@ -66,7 +79,7 @@ export class UploadController {
       }),
       fileFilter: (req, file, callback) => {
         if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
-          return callback(new BadRequestException('Only image files are allowed!'), false);
+          return callback(new BadRequestException('Apenas arquivos de imagem são permitidos!'), false);
         }
         callback(null, true);
       },
@@ -77,8 +90,9 @@ export class UploadController {
   )
   uploadImages(@UploadedFiles() files: Express.Multer.File[]) {
     if (!files || files.length === 0) {
-      throw new BadRequestException('Files are required');
+      throw new BadRequestException('Os arquivos são obrigatórios');
     }
+    
     return files.map((file) => ({
       url: `/uploads/${file.filename}`,
       filename: file.filename,

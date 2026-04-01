@@ -9,14 +9,17 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '@prisma/client';
+import { UserRole, User } from '@prisma/client';
+import { GetUser } from '../auth/get-user.decorator';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { UpdateStockAvailabilityDto } from './dto/update-stock-availability.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('products')
@@ -24,8 +27,8 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   /**
-   * POST /products
-   * Criar um novo produto
+   * Cria um novo produto.
+   * Apenas MASTER_ADMIN e TENANT_ADMIN podem criar produtos.
    */
   @Post()
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
@@ -35,40 +38,58 @@ export class ProductController {
   }
 
   /**
-   * GET /products
-   * Listar todos os produtos do tenant
+   * Lista todos os produtos do tenant atual.
+   * Pode ser filtrado por categoryId.
+   * Acesso permitido para MASTER_ADMIN, TENANT_ADMIN e CUSTOMER.
    */
   @Get()
-  // @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN, UserRole.CUSTOMER)
-  findAll() {
-    return this.productService.findAll();
+  @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN, UserRole.CUSTOMER)
+  findAll(
+    @Query('categoryId') categoryId?: string,
+    @GetUser() user?: User,
+  ) {
+    return this.productService.findAll(categoryId, user?.role);
   }
 
   /**
-   * GET /products/:id
-   * Obter um produto específico
+   * Obtém um produto específico pelo ID.
+   * Acesso permitido para MASTER_ADMIN, TENANT_ADMIN e CUSTOMER.
    */
-  @Get(":id")
-  // @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN, UserRole.CUSTOMER)
+  @Get(':id')
+  @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN, UserRole.CUSTOMER)
   findOne(@Param('id') id: string) {
     return this.productService.findOne(id);
   }
 
   /**
-   * PATCH /products/:id
-   * Atualizar um produto
+   * Atualiza um produto existente pelo ID.
+   * Apenas MASTER_ADMIN e TENANT_ADMIN podem atualizar produtos.
    */
-  @Patch(":id")
+  @Patch(':id')
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(id, updateProductDto);
   }
 
   /**
-   * DELETE /products/:id
-   * Deletar um produto
+   * Atualiza o estoque e a disponibilidade de um produto existente pelo ID.
+   * Apenas MASTER_ADMIN e TENANT_ADMIN podem atualizar o estoque/disponibilidade.
    */
-  @Delete(":id")
+  @Patch(':id/stock-availability')
+  @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
+  updateStockAndAvailability(
+    @Param('id') id: string,
+    @Body() updateStockAvailabilityDto: UpdateStockAvailabilityDto,
+  ) {
+    const { stock, isActive } = updateStockAvailabilityDto;
+    return this.productService.updateStockAndAvailability(id, stock, isActive);
+  }
+
+  /**
+   * Remove um produto pelo ID.
+   * Apenas MASTER_ADMIN e TENANT_ADMIN podem remover produtos.
+   */
+  @Delete(':id')
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
