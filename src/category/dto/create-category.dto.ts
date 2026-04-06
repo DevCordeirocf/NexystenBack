@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength, IsUUID} from 'class-validator';
 
 export class CreateCategoryDto {
   @IsString({ message: 'O nome da categoria deve ser uma string.' })
@@ -11,5 +11,7 @@ export class CreateCategoryDto {
   @MaxLength(500, { message: 'A descrição da categoria não pode ter mais de 500 caracteres.' })
   description?: string;
 
+  @IsOptional()
+  @IsUUID('4', { message: 'O tenantId deve ser um UUID válido.' })
   tenantId?: string; // Será preenchido pelo interceptor/decorator
 }

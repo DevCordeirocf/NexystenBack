@@ -1,4 +1,4 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, ForbiddenException } from '@nestjs/common';
+import { CallHandler, ExecutionContext, ForbiddenException, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { TenantContextService } from './tenant-context.service';
 
@@ -9,6 +9,7 @@ export class TenantInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const tenantId = request.headers['x-tenant-id'] as string;
+    request.tenantId = tenantId ?? null;
     const url = request.url;
 
     // Lista de rotas que não exigem obrigatoriamente o X-Tenant-ID (ex: Login Global, Registro de Admin)
@@ -17,7 +18,7 @@ export class TenantInterceptor implements NestInterceptor {
                          url.includes('/tenant-admin');
 
     if (!tenantId && !isPublicRoute) {
-      throw new ForbiddenException('X-Tenant-ID header is required.');
+      throw new ForbiddenException('X-Tenant-ID é necessário no header');
     }
 
     // Se não houver tenantId (como no caso do Master Admin), iniciamos o contexto como vazio ou nulo

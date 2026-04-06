@@ -14,6 +14,7 @@ export class CategoryService {
    */
   async create(createCategoryDto: CreateCategoryDto) {
     const { tenantId, ...data } = createCategoryDto;
+    console.log(tenantId)
     if (!tenantId) {
       throw new BadRequestException("O ID do Tenant é obrigatório para criar uma categoria.");
     }

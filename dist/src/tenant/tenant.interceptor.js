@@ -21,12 +21,13 @@ let TenantInterceptor = class TenantInterceptor {
     intercept(context, next) {
         const request = context.switchToHttp().getRequest();
         const tenantId = request.headers['x-tenant-id'];
+        request.tenantId = tenantId ?? null;
         const url = request.url;
         const isPublicRoute = url.includes('/auth/login') ||
             url.includes('/auth/register') ||
             url.includes('/tenant-admin');
         if (!tenantId && !isPublicRoute) {
-            throw new common_1.ForbiddenException('X-Tenant-ID header is required.');
+            throw new common_1.ForbiddenException('X-Tenant-ID é necessário no header');
         }
         return new rxjs_1.Observable(subscriber => {
             if (tenantId) {

@@ -29,4 +29,9 @@ __decorate([
     (0, class_validator_1.MaxLength)(500, { message: 'A descrição da categoria não pode ter mais de 500 caracteres.' }),
     __metadata("design:type", String)
 ], CreateCategoryDto.prototype, "description", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsUUID)('4', { message: 'O tenantId deve ser um UUID válido.' }),
+    __metadata("design:type", String)
+], CreateCategoryDto.prototype, "tenantId", void 0);
 //# sourceMappingURL=create-category.dto.js.map
