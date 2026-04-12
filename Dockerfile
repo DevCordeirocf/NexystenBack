@@ -1,7 +1,12 @@
 # Stage 1: Build
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /app
+
+# Instala dependências do sistema necessárias para o Prisma (OpenSSL)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends openssl libssl-dev ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 # Instala as dependências primeiro (aproveita o cache do Docker)
 COPY package*.json ./
@@ -14,9 +19,14 @@ RUN npx prisma generate
 RUN npm run build
 
 # Stage 2: Runtime
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 
 WORKDIR /app
+
+# Instala dependências de sistema necessárias para o Prisma em tempo de execução
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends openssl ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copia apenas o necessário do builder
 COPY --from=builder /app/node_modules ./node_modules
