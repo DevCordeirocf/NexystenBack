@@ -1,20 +1,10 @@
 {
   "info": {
-    "_postman_id": "e5f69db9-8e83-44bf-89c1-86b39def50af",
+    "_postman_id": "b108f238-60a6-4047-b58c-312cfce21d24",
     "name": "Nexysten API",
     "description": "API para o sistema Nexysten - SaaS Multi-tenant",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "38666314"
-  },
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{authToken}}",
-        "type": "string"
-      }
-    ]
   },
   "item": [
     {
@@ -52,7 +42,8 @@
                 "auth",
                 "login"
               ]
-            }
+            },
+            "description": "Autentica um usuário e retorna um token de acesso para uso nas requisições subsequentes.\n\n## Cabeçalhos da Requisição\n\n| Cabeçalho | Valor | Obrigatório |\n|---|---|---|\n| `Content-Type` | `application/json` | Sim |\n| `X-Tenant-ID` | Identificador do tenant | Sim |\n\n> **Atenção:** O cabeçalho `X-Tenant-ID` é obrigatório. Requisições sem ele retornarão um erro `403 Forbidden`.\n\n## Corpo da Requisição\n\n| Campo | Tipo | Descrição |\n|---|---|---|\n| `email` | `string` | Endereço de e-mail do usuário. Utiliza a variável `{{userEmail}}`. |\n| `password` | `string` | Senha do usuário. Utiliza a variável `{{userPassword}}`. |\n\n### Exemplo\n\n```json\n{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}\n```\n\n## Respostas\n\n| Status | Descrição |\n|---|---|\n| `200 OK` | Autenticação realizada com sucesso. Retorna um token de acesso. |\n| `403 Forbidden` | Cabeçalho `X-Tenant-ID` ausente ou inválido, ou credenciais incorretas. |\n\n## Variáveis\n\nCertifique-se de que as seguintes variáveis estão definidas no seu ambiente ativo:\n\n- `baseUrl` — URL base da API (ex: `https://api.example.com`)\n- `userEmail` — Endereço de e-mail do usuário a ser autenticado\n- `userPassword` — Senha do usuário a ser autenticado"
           },
           "response": []
         },
@@ -916,6 +907,40 @@
           "response": []
         }
       ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
     }
   ],
   "variable": [
