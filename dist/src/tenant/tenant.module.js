@@ -8,14 +8,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TenantModule = void 0;
 const common_1 = require("@nestjs/common");
+const prisma_module_1 = require("../database/prisma.module");
 const tenant_context_service_1 = require("./tenant-context.service");
+const tenant_interceptor_1 = require("./tenant.interceptor");
 let TenantModule = class TenantModule {
 };
 exports.TenantModule = TenantModule;
 exports.TenantModule = TenantModule = __decorate([
     (0, common_1.Module)({
-        providers: [tenant_context_service_1.TenantContextService],
-        exports: [tenant_context_service_1.TenantContextService],
+        imports: [(0, common_1.forwardRef)(() => prisma_module_1.PrismaModule)],
+        providers: [tenant_context_service_1.TenantContextService, tenant_interceptor_1.TenantInterceptor],
+        exports: [tenant_context_service_1.TenantContextService, tenant_interceptor_1.TenantInterceptor],
     })
 ], TenantModule);
 //# sourceMappingURL=tenant.module.js.map

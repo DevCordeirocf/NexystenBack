@@ -21,7 +21,7 @@ async function bootstrap() {
         transform: true,
     }));
     app.useGlobalFilters(new http_exception_filter_1.HttpExceptionFilter());
-    const port = process.env.PORT || 3000;
+    const port = process.env.PORT || 3001;
     await app.listen(port);
     console.log(`
 ╔════════════════════════════════════════════════════════════════╗

@@ -35,7 +35,7 @@ async function bootstrap() {
   // Registro do filtro global de tratamento de erros
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 3001;
   await app.listen(port);
 
   console.log(`

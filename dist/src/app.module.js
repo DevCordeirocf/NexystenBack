@@ -26,11 +26,11 @@ exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            tenant_module_1.TenantModule,
             prisma_module_1.PrismaModule,
+            tenant_module_1.TenantModule,
+            auth_module_1.AuthModule,
             product_module_1.ProductModule,
             contact_request_module_1.ContactRequestModule,
-            auth_module_1.AuthModule,
             tenant_admin_module_1.TenantAdminModule,
             category_module_1.CategoryModule,
             upload_module_1.UploadModule,

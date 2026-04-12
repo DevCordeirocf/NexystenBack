@@ -20,6 +20,7 @@ import { UserRole, User } from '@prisma/client';
 import { GetUser } from '../auth/get-user.decorator';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { UpdateStockAvailabilityDto } from './dto/update-stock-availability.dto';
+import { Public } from '../auth/public.decorator';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('products')
@@ -40,10 +41,10 @@ export class ProductController {
   /**
    * Lista todos os produtos do tenant atual.
    * Pode ser filtrado por categoryId.
-   * Acesso permitido para MASTER_ADMIN, TENANT_ADMIN e CUSTOMER.
+   * Acesso PÚBLICO para a vitrine.
    */
+  @Public()
   @Get()
-  @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN, UserRole.CUSTOMER)
   findAll(
     @Query('categoryId') categoryId?: string,
     @GetUser() user?: User,
@@ -53,10 +54,10 @@ export class ProductController {
 
   /**
    * Obtém um produto específico pelo ID.
-   * Acesso permitido para MASTER_ADMIN, TENANT_ADMIN e CUSTOMER.
+   * Acesso PÚBLICO para a vitrine.
    */
+  @Public()
   @Get(':id')
-  @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN, UserRole.CUSTOMER)
   findOne(@Param('id') id: string) {
     return this.productService.findOne(id);
   }

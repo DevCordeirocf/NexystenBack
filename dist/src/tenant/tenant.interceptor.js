@@ -13,32 +13,56 @@ exports.TenantInterceptor = void 0;
 const common_1 = require("@nestjs/common");
 const rxjs_1 = require("rxjs");
 const tenant_context_service_1 = require("./tenant-context.service");
+const prisma_service_1 = require("../database/prisma.service");
 let TenantInterceptor = class TenantInterceptor {
     tenantContextService;
-    constructor(tenantContextService) {
+    prisma;
+    constructor(tenantContextService, prisma) {
         this.tenantContextService = tenantContextService;
+        this.prisma = prisma;
     }
     intercept(context, next) {
         const request = context.switchToHttp().getRequest();
-        const tenantId = request.headers['x-tenant-id'];
-        request.tenantId = tenantId ?? null;
+        const tenantHeader = request.headers['x-tenant-id'];
         const url = request.url;
         const isPublicRoute = url.includes('/auth/login') ||
             url.includes('/auth/register') ||
-            url.includes('/tenant-admin');
-        if (!tenantId && !isPublicRoute) {
+            url.includes('/tenant-admin') ||
+            url.includes('/tenants/public');
+        if (!tenantHeader && !isPublicRoute) {
             throw new common_1.ForbiddenException('X-Tenant-ID é necessário no header');
         }
         return new rxjs_1.Observable(subscriber => {
-            if (tenantId) {
-                this.tenantContextService.run(tenantId, () => {
-                    this.executeNext(next, subscriber);
-                });
+            if (tenantHeader) {
+                this.resolveTenantId(tenantHeader).then(resolvedId => {
+                    if (!resolvedId && !isPublicRoute) {
+                        subscriber.error(new common_1.ForbiddenException('Tenant inválido ou não encontrado.'));
+                        return;
+                    }
+                    if (resolvedId) {
+                        this.tenantContextService.run(resolvedId, () => {
+                            this.executeNext(next, subscriber);
+                        });
+                    }
+                    else {
+                        this.executeNext(next, subscriber);
+                    }
+                }).catch(err => subscriber.error(err));
             }
             else {
                 this.executeNext(next, subscriber);
             }
         });
+    }
+    async resolveTenantId(identifier) {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier);
+        if (isUuid)
+            return identifier;
+        const tenant = await this.prisma.tenantStore.findUnique({
+            where: { name: identifier },
+            select: { id: true }
+        });
+        return tenant?.id || null;
     }
     executeNext(next, subscriber) {
         next.handle().subscribe({
@@ -51,6 +75,7 @@ let TenantInterceptor = class TenantInterceptor {
 exports.TenantInterceptor = TenantInterceptor;
 exports.TenantInterceptor = TenantInterceptor = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [tenant_context_service_1.TenantContextService])
+    __metadata("design:paramtypes", [tenant_context_service_1.TenantContextService,
+        prisma_service_1.PrismaService])
 ], TenantInterceptor);
 //# sourceMappingURL=tenant.interceptor.js.map

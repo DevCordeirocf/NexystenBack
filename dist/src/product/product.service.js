@@ -52,7 +52,7 @@ let ProductService = class ProductService {
                 some: { id: categoryId }
             } : undefined,
         };
-        if (userRole === client_1.UserRole.CUSTOMER) {
+        if (!userRole || userRole === client_1.UserRole.CUSTOMER) {
             where.isActive = true;
             where.stock = { gt: 0 };
         }

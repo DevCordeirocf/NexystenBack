@@ -43,7 +43,8 @@ export class ProductService {
 
   /**
    * Lista todos os produtos do tenant atual, com opção de filtrar por categoria.
-   * Se o usuário for CUSTOMER, filtra apenas produtos ativos e com estoque.
+   * Se o usuário for CUSTOMER ou NÃO ESTIVER LOGADO (vitrine pública), 
+   * filtra apenas produtos ativos e com estoque.
    */
   async findAll(categoryId?: string, userRole?: UserRole) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
@@ -55,8 +56,8 @@ export class ProductService {
       } : undefined,
     };
 
-    // Se for cliente, aplica filtros de disponibilidade
-    if (userRole === UserRole.CUSTOMER) {
+    // Se for cliente ou acesso público (sem role), aplica filtros de disponibilidade
+    if (!userRole || userRole === UserRole.CUSTOMER) {
       where.isActive = true;
       where.stock = { gt: 0 };
     }

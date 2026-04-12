@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
+import { PrismaModule } from '../database/prisma.module';
 import { TenantContextService } from './tenant-context.service';
+import { TenantInterceptor } from './tenant.interceptor';
 
 @Module({
-  providers: [TenantContextService],
-  // Exportamos o serviço para que ele possa ser injetado em qualquer outro módulo,
-  // como o PrismaService (para o middleware) e em Interceptors/Guards.
-  exports: [TenantContextService], 
+  imports: [forwardRef(() => PrismaModule)],
+  providers: [TenantContextService, TenantInterceptor],
+  exports: [TenantContextService, TenantInterceptor], 
 })
 export class TenantModule {}

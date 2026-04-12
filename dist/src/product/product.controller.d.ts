@@ -19,14 +19,14 @@ export declare class ProductController {
         id: string;
         name: string;
         description: string;
+        price: import("@prisma/client/runtime/library").Decimal;
+        stock: number;
+        isActive: boolean;
+        images: string[];
+        specifications: import("@prisma/client/runtime/library").JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
         tenantId: string;
-        isActive: boolean;
-        price: import("@prisma/client/runtime/library").Decimal;
-        stock: number;
-        images: string[];
-        specifications: import("@prisma/client/runtime/library").JsonValue | null;
     }>;
     findAll(categoryId?: string, user?: User): Promise<({
         categories: {
@@ -41,14 +41,14 @@ export declare class ProductController {
         id: string;
         name: string;
         description: string;
+        price: import("@prisma/client/runtime/library").Decimal;
+        stock: number;
+        isActive: boolean;
+        images: string[];
+        specifications: import("@prisma/client/runtime/library").JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
         tenantId: string;
-        isActive: boolean;
-        price: import("@prisma/client/runtime/library").Decimal;
-        stock: number;
-        images: string[];
-        specifications: import("@prisma/client/runtime/library").JsonValue | null;
     })[]>;
     findOne(id: string): Promise<{
         categories: {
@@ -63,14 +63,14 @@ export declare class ProductController {
         id: string;
         name: string;
         description: string;
+        price: import("@prisma/client/runtime/library").Decimal;
+        stock: number;
+        isActive: boolean;
+        images: string[];
+        specifications: import("@prisma/client/runtime/library").JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
         tenantId: string;
-        isActive: boolean;
-        price: import("@prisma/client/runtime/library").Decimal;
-        stock: number;
-        images: string[];
-        specifications: import("@prisma/client/runtime/library").JsonValue | null;
     }>;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
         categories: {
@@ -85,14 +85,14 @@ export declare class ProductController {
         id: string;
         name: string;
         description: string;
+        price: import("@prisma/client/runtime/library").Decimal;
+        stock: number;
+        isActive: boolean;
+        images: string[];
+        specifications: import("@prisma/client/runtime/library").JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
         tenantId: string;
-        isActive: boolean;
-        price: import("@prisma/client/runtime/library").Decimal;
-        stock: number;
-        images: string[];
-        specifications: import("@prisma/client/runtime/library").JsonValue | null;
     }>;
     updateStockAndAvailability(id: string, updateStockAvailabilityDto: UpdateStockAvailabilityDto): Promise<{
         categories: {
@@ -107,26 +107,26 @@ export declare class ProductController {
         id: string;
         name: string;
         description: string;
+        price: import("@prisma/client/runtime/library").Decimal;
+        stock: number;
+        isActive: boolean;
+        images: string[];
+        specifications: import("@prisma/client/runtime/library").JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
         tenantId: string;
-        isActive: boolean;
-        price: import("@prisma/client/runtime/library").Decimal;
-        stock: number;
-        images: string[];
-        specifications: import("@prisma/client/runtime/library").JsonValue | null;
     }>;
     remove(id: string): Promise<{
         id: string;
         name: string;
         description: string;
+        price: import("@prisma/client/runtime/library").Decimal;
+        stock: number;
+        isActive: boolean;
+        images: string[];
+        specifications: import("@prisma/client/runtime/library").JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
         tenantId: string;
-        isActive: boolean;
-        price: import("@prisma/client/runtime/library").Decimal;
-        stock: number;
-        images: string[];
-        specifications: import("@prisma/client/runtime/library").JsonValue | null;
     }>;
 }

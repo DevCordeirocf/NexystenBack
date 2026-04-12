@@ -23,6 +23,7 @@ const client_1 = require("@prisma/client");
 const get_user_decorator_1 = require("../auth/get-user.decorator");
 const update_product_dto_1 = require("./dto/update-product.dto");
 const update_stock_availability_dto_1 = require("./dto/update-stock-availability.dto");
+const public_decorator_1 = require("../auth/public.decorator");
 let ProductController = class ProductController {
     productService;
     constructor(productService) {
@@ -59,8 +60,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProductController.prototype, "create", null);
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Get)(),
-    (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN, client_1.UserRole.TENANT_ADMIN, client_1.UserRole.CUSTOMER),
     __param(0, (0, common_1.Query)('categoryId')),
     __param(1, (0, get_user_decorator_1.GetUser)()),
     __metadata("design:type", Function),
@@ -68,8 +69,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProductController.prototype, "findAll", null);
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Get)(':id'),
-    (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN, client_1.UserRole.TENANT_ADMIN, client_1.UserRole.CUSTOMER),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

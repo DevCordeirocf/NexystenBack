@@ -15,11 +15,11 @@ import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
-    TenantModule,
-    PrismaModule,
+    PrismaModule, // Primeiro o banco
+    TenantModule, // Depois o contexto do tenant
+    AuthModule,
     ProductModule,
     ContactRequestModule,
-    AuthModule,
     TenantAdminModule,
     CategoryModule,
     UploadModule,

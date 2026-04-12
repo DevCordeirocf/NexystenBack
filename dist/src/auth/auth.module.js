@@ -8,13 +8,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
-const auth_service_1 = require("./auth.service");
-const auth_controller_1 = require("./auth.controller");
-const prisma_module_1 = require("../database/prisma.module");
-const passport_1 = require("@nestjs/passport");
 const jwt_1 = require("@nestjs/jwt");
-const jwt_strategy_1 = require("./jwt.strategy");
+const passport_1 = require("@nestjs/passport");
+const prisma_module_1 = require("../database/prisma.module");
 const tenant_module_1 = require("../tenant/tenant.module");
+const auth_controller_1 = require("./auth.controller");
+const auth_service_1 = require("./auth.service");
+const jwt_strategy_1 = require("./jwt.strategy");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -22,16 +22,16 @@ exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
             prisma_module_1.PrismaModule,
-            passport_1.PassportModule,
+            passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
             jwt_1.JwtModule.register({
-                secret: process.env.JWT_SECRET,
+                secret: process.env.JWT_SECRET || 'fallback_secret',
                 signOptions: { expiresIn: process.env.JWT_EXPIRATION || '60m' },
             }),
             tenant_module_1.TenantModule,
         ],
         providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
         controllers: [auth_controller_1.AuthController],
-        exports: [auth_service_1.AuthService, jwt_1.JwtModule],
+        exports: [auth_service_1.AuthService, jwt_1.JwtModule, passport_1.PassportModule],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map
