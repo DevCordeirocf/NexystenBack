@@ -24,9 +24,11 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 
-# Expõe a porta que o NestJS usa (padrão 3000 ou 3001)
-EXPOSE 3001
+# O Render injeta a porta automaticamente na variável PORT
+# Se não houver, o NestJS costuma usar 3001 no seu projeto
+ENV PORT=3001
+EXPOSE $PORT
 
 # Comando para rodar as migrações e iniciar o servidor
-# O Prisma precisa das migrações aplicadas no banco de produção
+# No Render (Free), o comando precisa ser direto para evitar timeouts
 CMD npx prisma migrate deploy && node dist/main
