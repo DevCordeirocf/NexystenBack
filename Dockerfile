@@ -41,4 +41,4 @@ EXPOSE $PORT
 
 # Comando para rodar as migrações e iniciar o servidor
 # No Render (Free), o comando precisa ser direto para evitar timeouts
-CMD npx prisma migrate deploy && node dist/main
+CMD npx prisma migrate deploy && node dist/src/main.js
