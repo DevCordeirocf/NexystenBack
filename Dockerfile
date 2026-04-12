@@ -6,7 +6,7 @@ WORKDIR /app
 # Instala as dependências primeiro (aproveita o cache do Docker)
 COPY package*.json ./
 COPY prisma ./prisma/
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Copia o restante do código e faz o build
 COPY . .
