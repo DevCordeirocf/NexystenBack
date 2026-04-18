@@ -28,7 +28,9 @@ let TenantInterceptor = class TenantInterceptor {
         const isPublicRoute = url.includes('/auth/login') ||
             url.includes('/auth/register') ||
             url.includes('/tenant-admin') ||
-            url.includes('/tenants/public');
+            url.includes('/tenants/public') ||
+            url.includes('/dev/tenants') ||
+            url.includes('/api');
         if (!tenantHeader && !isPublicRoute) {
             throw new common_1.ForbiddenException('X-Tenant-ID é necessário no header');
         }

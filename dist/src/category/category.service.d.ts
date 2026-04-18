@@ -7,41 +7,41 @@ export declare class CategoryService {
     create(createCategoryDto: CreateCategoryDto): Promise<{
         id: string;
         name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        description: string | null;
         tenantId: string;
     }>;
     findAll(tenantId: string): Promise<{
         id: string;
         name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        description: string | null;
         tenantId: string;
     }[]>;
     findOne(id: string, tenantId: string): Promise<{
         id: string;
         name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        description: string | null;
         tenantId: string;
     }>;
     update(id: string, tenantId: string, updateCategoryDto: UpdateCategoryDto): Promise<{
         id: string;
         name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        description: string | null;
         tenantId: string;
     }>;
     remove(id: string, tenantId: string): Promise<{
         id: string;
         name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        description: string | null;
         tenantId: string;
     }>;
 }

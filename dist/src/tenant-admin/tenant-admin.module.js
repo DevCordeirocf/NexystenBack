@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const tenant_admin_service_1 = require("./tenant-admin.service");
 const tenant_admin_controller_1 = require("./tenant-admin.controller");
 const tenant_public_controller_1 = require("./tenant-public.controller");
+const tenant_dev_controller_1 = require("./tenant-dev.controller");
 const prisma_module_1 = require("../database/prisma.module");
 const auth_module_1 = require("../auth/auth.module");
 let TenantAdminModule = class TenantAdminModule {
@@ -19,7 +20,7 @@ exports.TenantAdminModule = TenantAdminModule;
 exports.TenantAdminModule = TenantAdminModule = __decorate([
     (0, common_1.Module)({
         imports: [prisma_module_1.PrismaModule, auth_module_1.AuthModule],
-        controllers: [tenant_admin_controller_1.TenantAdminController, tenant_public_controller_1.TenantPublicController],
+        controllers: [tenant_admin_controller_1.TenantAdminController, tenant_public_controller_1.TenantPublicController, tenant_dev_controller_1.TenantDevController],
         providers: [tenant_admin_service_1.TenantAdminService],
         exports: [tenant_admin_service_1.TenantAdminService],
     })

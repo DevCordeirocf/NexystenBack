@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -35,6 +36,19 @@ async function bootstrap() {
   // Registro do filtro global de tratamento de erros
   app.useGlobalFilters(new HttpExceptionFilter());
 
+  // Configuração do Swagger (OpenAPI)
+  const config = new DocumentBuilder()
+    .setTitle('Nexysten API')
+    .setDescription('Documentação Nexysten - SaaS Multi-tenant')
+    .setVersion('1.0')
+    .addTag('Nexysten')
+    .addBearerAuth()
+    .addApiKey({ type: 'apiKey', name: 'X-Tenant-ID', in: 'header' }, 'X-Tenant-ID')
+    .build();
+  
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   const port = process.env.PORT || 3001;
   await app.listen(port);
 
@@ -45,6 +59,7 @@ async function bootstrap() {
 ║                                                                ║
 ║   ✅ Servidor iniciado com sucesso!                           ║
 ║   📍 URL: http://localhost:${port}                             ║
+║   📖 Swagger: http://localhost:${port}/api                         ║
 ║   🔒 Isolamento Multi-tenant: ATIVO                           ║
 ║   📊 Banco de Dados: PostgreSQL (via Prisma)                  ║
 ║                                                                ║

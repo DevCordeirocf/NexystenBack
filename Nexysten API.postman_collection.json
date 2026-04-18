@@ -8,6 +8,58 @@
   },
   "item": [
     {
+      "name": "Desenvolvimento",
+      "description": "Endpoints criados para facilitar o desenvolvimento e teste do front-end, sem autenticação ou X-Tenant-ID.",
+      "item": [
+        {
+          "name": "GET Todos os Tenants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dev/tenants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dev",
+                "tenants"
+              ]
+            },
+            "description": "Retorna uma lista de todos os IDs, nomes e status de ativação dos tenants cadastrados no sistema. Útil para configurar o {{tenantId}}."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Tenant Público por Nome",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/public/:name",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "public",
+                ":name"
+              ],
+              "variable": [
+                {
+                  "key": "name",
+                  "value": "nome-da-loja",
+                  "description": "Nome (subdomínio) do tenant"
+                }
+              ]
+            },
+            "description": "Retorna as configurações públicas de um tenant específico pelo nome."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Autenticação",
       "item": [
         {

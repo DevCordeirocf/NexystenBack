@@ -7,9 +7,9 @@ export declare class TenantAdminController {
     create(createTenantDto: CreateTenantDto): Promise<{
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
         logoUrl: string | null;
         whatsapp: string | null;
@@ -22,9 +22,9 @@ export declare class TenantAdminController {
     } & {
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
         logoUrl: string | null;
         whatsapp: string | null;
@@ -37,9 +37,9 @@ export declare class TenantAdminController {
     } & {
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
         logoUrl: string | null;
         whatsapp: string | null;
@@ -47,9 +47,9 @@ export declare class TenantAdminController {
     update(id: string, updateTenantDto: UpdateTenantDto): Promise<{
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
         logoUrl: string | null;
         whatsapp: string | null;
@@ -57,9 +57,9 @@ export declare class TenantAdminController {
     remove(id: string): Promise<{
         id: string;
         name: string;
+        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        isActive: boolean;
         themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
         logoUrl: string | null;
         whatsapp: string | null;

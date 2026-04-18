@@ -19,13 +19,13 @@ export declare class AuthService {
     }>;
     validateUser(payload: any): Promise<{
         id: string;
-        email: string;
-        password: string;
         name: string | null;
-        phone: string | null;
-        role: import(".prisma/client").$Enums.UserRole;
         createdAt: Date;
         updatedAt: Date;
         tenantId: string | null;
+        email: string;
+        password: string;
+        phone: string | null;
+        role: import(".prisma/client").$Enums.UserRole;
     } | null>;
 }

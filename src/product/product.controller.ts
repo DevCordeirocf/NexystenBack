@@ -11,6 +11,7 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiHeader, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -22,6 +23,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { UpdateStockAvailabilityDto } from './dto/update-stock-availability.dto';
 import { Public } from '../auth/public.decorator';
 
+@ApiTags('Produtos')
+@ApiHeader({ name: 'X-Tenant-ID', description: 'ID ou nome do tenant', required: true })
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('products')
 export class ProductController {
@@ -32,6 +35,8 @@ export class ProductController {
    * Apenas MASTER_ADMIN e TENANT_ADMIN podem criar produtos.
    */
   @Post()
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Criar um novo produto' })
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createProductDto: CreateProductDto) {
@@ -45,6 +50,8 @@ export class ProductController {
    */
   @Public()
   @Get()
+  @ApiOperation({ summary: 'Listar todos os produtos do tenant' })
+  @ApiQuery({ name: 'categoryId', required: false, description: 'Filtrar por ID da categoria' })
   findAll(
     @Query('categoryId') categoryId?: string,
     @GetUser() user?: User,

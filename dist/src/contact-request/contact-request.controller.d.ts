@@ -7,14 +7,14 @@ export declare class ContactRequestController {
     create(createContactRequestDto: CreateContactRequestDto, user?: any): Promise<{
         id: string;
         createdAt: Date;
+        message: string | null;
         tenantId: string;
+        userId: string | null;
+        productId: string;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
-        message: string | null;
         status: string;
-        productId: string;
-        userId: string | null;
     }>;
     findAll(status?: string): Promise<({
         user: {
@@ -31,14 +31,14 @@ export declare class ContactRequestController {
     } & {
         id: string;
         createdAt: Date;
+        message: string | null;
         tenantId: string;
+        userId: string | null;
+        productId: string;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
-        message: string | null;
         status: string;
-        productId: string;
-        userId: string | null;
     })[]>;
     findOne(id: string): Promise<{
         user: {
@@ -50,64 +50,64 @@ export declare class ContactRequestController {
         product: {
             id: string;
             name: string;
-            description: string;
+            isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
-            tenantId: string;
-            isActive: boolean;
+            description: string;
             price: import("@prisma/client/runtime/library").Decimal;
-            stock: number;
             images: string[];
             specifications: import("@prisma/client/runtime/library").JsonValue | null;
+            stock: number;
+            tenantId: string;
         };
     } & {
         id: string;
         createdAt: Date;
+        message: string | null;
         tenantId: string;
+        userId: string | null;
+        productId: string;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
-        message: string | null;
         status: string;
-        productId: string;
-        userId: string | null;
     }>;
     update(id: string, updateContactRequestDto: UpdateContactRequestDto): Promise<{
         product: {
             id: string;
             name: string;
-            description: string;
+            isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
-            tenantId: string;
-            isActive: boolean;
+            description: string;
             price: import("@prisma/client/runtime/library").Decimal;
-            stock: number;
             images: string[];
             specifications: import("@prisma/client/runtime/library").JsonValue | null;
+            stock: number;
+            tenantId: string;
         };
     } & {
         id: string;
         createdAt: Date;
+        message: string | null;
         tenantId: string;
+        userId: string | null;
+        productId: string;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
-        message: string | null;
         status: string;
-        productId: string;
-        userId: string | null;
     }>;
     remove(id: string): Promise<{
         id: string;
         createdAt: Date;
+        message: string | null;
         tenantId: string;
+        userId: string | null;
+        productId: string;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
-        message: string | null;
         status: string;
-        productId: string;
-        userId: string | null;
     }>;
 }

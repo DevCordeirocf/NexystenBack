@@ -10,123 +10,123 @@ export declare class ProductController {
         categories: {
             id: string;
             name: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
+            description: string | null;
             tenantId: string;
         }[];
     } & {
         id: string;
         name: string;
-        description: string;
-        price: import("@prisma/client/runtime/library").Decimal;
-        stock: number;
         isActive: boolean;
-        images: string[];
-        specifications: import("@prisma/client/runtime/library").JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
+        description: string;
+        price: import("@prisma/client/runtime/library").Decimal;
+        images: string[];
+        specifications: import("@prisma/client/runtime/library").JsonValue | null;
+        stock: number;
         tenantId: string;
     }>;
     findAll(categoryId?: string, user?: User): Promise<({
         categories: {
             id: string;
             name: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
+            description: string | null;
             tenantId: string;
         }[];
     } & {
         id: string;
         name: string;
-        description: string;
-        price: import("@prisma/client/runtime/library").Decimal;
-        stock: number;
         isActive: boolean;
-        images: string[];
-        specifications: import("@prisma/client/runtime/library").JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
+        description: string;
+        price: import("@prisma/client/runtime/library").Decimal;
+        images: string[];
+        specifications: import("@prisma/client/runtime/library").JsonValue | null;
+        stock: number;
         tenantId: string;
     })[]>;
     findOne(id: string): Promise<{
         categories: {
             id: string;
             name: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
+            description: string | null;
             tenantId: string;
         }[];
     } & {
         id: string;
         name: string;
-        description: string;
-        price: import("@prisma/client/runtime/library").Decimal;
-        stock: number;
         isActive: boolean;
-        images: string[];
-        specifications: import("@prisma/client/runtime/library").JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
+        description: string;
+        price: import("@prisma/client/runtime/library").Decimal;
+        images: string[];
+        specifications: import("@prisma/client/runtime/library").JsonValue | null;
+        stock: number;
         tenantId: string;
     }>;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
         categories: {
             id: string;
             name: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
+            description: string | null;
             tenantId: string;
         }[];
     } & {
         id: string;
         name: string;
-        description: string;
-        price: import("@prisma/client/runtime/library").Decimal;
-        stock: number;
         isActive: boolean;
-        images: string[];
-        specifications: import("@prisma/client/runtime/library").JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
+        description: string;
+        price: import("@prisma/client/runtime/library").Decimal;
+        images: string[];
+        specifications: import("@prisma/client/runtime/library").JsonValue | null;
+        stock: number;
         tenantId: string;
     }>;
     updateStockAndAvailability(id: string, updateStockAvailabilityDto: UpdateStockAvailabilityDto): Promise<{
         categories: {
             id: string;
             name: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
+            description: string | null;
             tenantId: string;
         }[];
     } & {
         id: string;
         name: string;
-        description: string;
-        price: import("@prisma/client/runtime/library").Decimal;
-        stock: number;
         isActive: boolean;
-        images: string[];
-        specifications: import("@prisma/client/runtime/library").JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
+        description: string;
+        price: import("@prisma/client/runtime/library").Decimal;
+        images: string[];
+        specifications: import("@prisma/client/runtime/library").JsonValue | null;
+        stock: number;
         tenantId: string;
     }>;
     remove(id: string): Promise<{
         id: string;
         name: string;
-        description: string;
-        price: import("@prisma/client/runtime/library").Decimal;
-        stock: number;
         isActive: boolean;
-        images: string[];
-        specifications: import("@prisma/client/runtime/library").JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
+        description: string;
+        price: import("@prisma/client/runtime/library").Decimal;
+        images: string[];
+        specifications: import("@prisma/client/runtime/library").JsonValue | null;
+        stock: number;
         tenantId: string;
     }>;
 }
