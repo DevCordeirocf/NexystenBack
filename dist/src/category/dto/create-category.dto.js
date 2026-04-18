@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateCategoryDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class CreateCategoryDto {
     name;
     description;
@@ -18,12 +19,14 @@ class CreateCategoryDto {
 }
 exports.CreateCategoryDto = CreateCategoryDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Nome da categoria', example: 'Joias de Luxo', maxLength: 100 }),
     (0, class_validator_1.IsString)({ message: 'O nome da categoria deve ser uma string.' }),
     (0, class_validator_1.IsNotEmpty)({ message: 'O nome da categoria não pode ser vazio.' }),
     (0, class_validator_1.MaxLength)(100, { message: 'O nome da categoria não pode ter mais de 100 caracteres.' }),
     __metadata("design:type", String)
 ], CreateCategoryDto.prototype, "name", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Descrição da categoria', example: 'Categoria destinada a joias exclusivas', maxLength: 500 }),
     (0, class_validator_1.IsString)({ message: 'A descrição da categoria deve ser uma string.' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.MaxLength)(500, { message: 'A descrição da categoria não pode ter mais de 500 caracteres.' }),

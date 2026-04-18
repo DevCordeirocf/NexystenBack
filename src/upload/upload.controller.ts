@@ -7,6 +7,7 @@ import {
   UseGuards,
   BadRequestException,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -19,6 +20,8 @@ import { UserRole } from '@prisma/client';
  * Controller responsável pelo upload de arquivos (imagens de produtos/imóveis).
  * Protegido por autenticação e restrito a administradores.
  */
+@ApiTags('Upload de Imagens')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('upload')
 export class UploadController {
@@ -28,6 +31,19 @@ export class UploadController {
    * Limite de 5MB. Formatos aceitos: jpg, jpeg, png, gif, webp.
    */
   @Post('image')
+  @ApiOperation({ summary: 'Realizar o upload de uma única imagem' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   @UseInterceptors(
     FileInterceptor('file', {
@@ -66,6 +82,22 @@ export class UploadController {
    * Realiza o upload de múltiplas imagens (até 10 por vez).
    */
   @Post('images')
+  @ApiOperation({ summary: 'Realizar o upload de múltiplas imagens (até 10 por vez)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   @UseInterceptors(
     FilesInterceptor('files', 10, {

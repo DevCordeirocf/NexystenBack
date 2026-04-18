@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateContactRequestDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class CreateContactRequestDto {
     userId;
     productId;
@@ -26,14 +27,17 @@ __decorate([
     __metadata("design:type", String)
 ], CreateContactRequestDto.prototype, "userId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'ID do produto de interesse', example: 'uuid-do-produto' }),
     (0, class_validator_1.IsUUID)("4", { message: "O productId deve ser um UUID válido." }),
     __metadata("design:type", String)
 ], CreateContactRequestDto.prototype, "productId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Nome do cliente interessado', example: 'Fulano de Tal' }),
     (0, class_validator_1.IsString)({ message: "O nome do cliente deve ser uma string." }),
     __metadata("design:type", String)
 ], CreateContactRequestDto.prototype, "customerName", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'E-mail para contato', example: 'fulano@exemplo.com' }),
     (0, class_validator_1.IsEmail)({}, { message: "O email do cliente deve ser um endereço de e-mail válido." }),
     __metadata("design:type", String)
 ], CreateContactRequestDto.prototype, "customerEmail", void 0);
@@ -43,6 +47,7 @@ __decorate([
     __metadata("design:type", String)
 ], CreateContactRequestDto.prototype, "customerPhone", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Mensagem adicional do cliente', example: 'Gostaria de saber mais sobre as especificações.' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)({ message: "A mensagem deve ser uma string." }),
     __metadata("design:type", String)

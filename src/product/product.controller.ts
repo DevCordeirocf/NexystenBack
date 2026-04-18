@@ -65,6 +65,7 @@ export class ProductController {
    */
   @Public()
   @Get(':id')
+  @ApiOperation({ summary: 'Obter um produto específico pelo ID' })
   findOne(@Param('id') id: string) {
     return this.productService.findOne(id);
   }
@@ -74,6 +75,8 @@ export class ProductController {
    * Apenas MASTER_ADMIN e TENANT_ADMIN podem atualizar produtos.
    */
   @Patch(':id')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Atualizar um produto existente' })
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(id, updateProductDto);
@@ -84,6 +87,8 @@ export class ProductController {
    * Apenas MASTER_ADMIN e TENANT_ADMIN podem atualizar o estoque/disponibilidade.
    */
   @Patch(':id/stock-availability')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Atualizar apenas estoque e disponibilidade de um produto' })
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   updateStockAndAvailability(
     @Param('id') id: string,
@@ -98,6 +103,8 @@ export class ProductController {
    * Apenas MASTER_ADMIN e TENANT_ADMIN podem remover produtos.
    */
   @Delete(':id')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Remover um produto' })
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {

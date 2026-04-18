@@ -13,7 +13,7 @@ export class TenantAdminService {
    * Cria uma nova loja (Tenant) e opcionalmente um usuário administrador
    */
   async create(createTenantDto: CreateTenantDto) {
-    const { name, isActive, themeConfig, logoUrl, whatsappNumber, adminEmail, adminPassword } = createTenantDto;
+    const { name, isActive, themeConfig, logoUrl, whatsapp, adminEmail, adminPassword } = createTenantDto;
 
     const existingTenant = await this.prisma.tenantStore.findUnique({ where: { name } });
     if (existingTenant) {
@@ -28,7 +28,7 @@ export class TenantAdminService {
           isActive,
           themeConfig,
           logoUrl,
-          whatsapp: whatsappNumber,
+          whatsapp,
         },
       });
 
@@ -80,7 +80,7 @@ export class TenantAdminService {
    * Atualiza as informações de uma loja existente
    */
   async update(id: string, updateTenantDto: UpdateTenantDto) {
-    const { logoUrl, whatsappNumber, ...dataToUpdate } = updateTenantDto;
+    const { logoUrl, whatsapp, ...dataToUpdate } = updateTenantDto;
     
     // Garante que a loja existe antes de atualizar
     await this.findOne(id); 
@@ -90,7 +90,7 @@ export class TenantAdminService {
       data: {
         ...dataToUpdate,
         logoUrl,
-        whatsapp: whatsappNumber,
+        whatsapp,
       },
     });
   }

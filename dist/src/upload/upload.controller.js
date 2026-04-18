@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UploadController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
 const path_1 = require("path");
@@ -44,6 +45,19 @@ let UploadController = class UploadController {
 exports.UploadController = UploadController;
 __decorate([
     (0, common_1.Post)('image'),
+    (0, swagger_1.ApiOperation)({ summary: 'Realizar o upload de uma única imagem' }),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                },
+            },
+        },
+    }),
     (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN, client_1.UserRole.TENANT_ADMIN),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
         storage: (0, multer_1.diskStorage)({
@@ -71,6 +85,22 @@ __decorate([
 ], UploadController.prototype, "uploadImage", null);
 __decorate([
     (0, common_1.Post)('images'),
+    (0, swagger_1.ApiOperation)({ summary: 'Realizar o upload de múltiplas imagens (até 10 por vez)' }),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                files: {
+                    type: 'array',
+                    items: {
+                        type: 'string',
+                        format: 'binary',
+                    },
+                },
+            },
+        },
+    }),
     (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN, client_1.UserRole.TENANT_ADMIN),
     (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('files', 10, {
         storage: (0, multer_1.diskStorage)({
@@ -97,6 +127,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UploadController.prototype, "uploadImages", null);
 exports.UploadController = UploadController = __decorate([
+    (0, swagger_1.ApiTags)('Upload de Imagens'),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, common_1.Controller)('upload')
 ], UploadController);

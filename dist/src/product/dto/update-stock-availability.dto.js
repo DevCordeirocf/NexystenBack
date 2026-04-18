@@ -11,17 +11,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateStockAvailabilityDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class UpdateStockAvailabilityDto {
     stock;
     isActive;
 }
 exports.UpdateStockAvailabilityDto = UpdateStockAvailabilityDto;
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Quantidade em estoque', example: 10 }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)({}, { message: 'O estoque deve ser um número.' }),
     __metadata("design:type", Number)
 ], UpdateStockAvailabilityDto.prototype, "stock", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Define se o produto está ativo na vitrine', example: true }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)({ message: 'isActive deve ser um valor booleano.' }),
     __metadata("design:type", Boolean)

@@ -1,11 +1,14 @@
 import { IsString, IsBoolean, IsOptional, IsEmail, MinLength, IsEnum, IsUUID, IsNotEmpty } from 'class-validator';
 import { UserRole } from '@prisma/client';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateTenantDto {
+  @ApiProperty({ description: 'Nome/Subdomínio do tenant', example: 'loja-do-luis' })
   @IsString({ message: 'O nome do tenant deve ser uma string.' })
   @IsNotEmpty({ message: 'O nome do tenant não pode ser vazio.' })
   name!: string;
 
+  @ApiPropertyOptional({ description: 'Define se o tenant está ativo', default: true })
   @IsOptional()
   @IsBoolean({ message: 'isActive deve ser um valor booleano.' })
   isActive?: boolean;
@@ -14,13 +17,15 @@ export class CreateTenantDto {
   // @IsJSON({ message: 'themeConfig deve ser um JSON válido.' })
   themeConfig?: Record<string, any>; // Flexible JSON for theme configuration
 
+  @ApiPropertyOptional({ description: 'URL da logomarca do tenant', example: 'https://exemplo.com/logo.png' })
   @IsString({ message: 'A URL da logo deve ser uma string.' })
   @IsOptional()
   logoUrl?: string;
 
+  @ApiPropertyOptional({ description: 'Número de WhatsApp para contato', example: '5511999999999' })
   @IsString({ message: 'O número do WhatsApp deve ser uma string.' })
   @IsOptional()
-  whatsappNumber?: string;
+  whatsapp?: string;
 
   // Admin User for this tenant (optional, can be created later)
   @IsOptional()

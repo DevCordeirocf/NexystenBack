@@ -1,7 +1,5 @@
-export declare class UpdateTenantDto {
-    name?: string;
-    isActive?: boolean;
-    themeConfig?: Record<string, any>;
-    logoUrl?: string;
-    whatsappNumber?: string;
+import { CreateTenantDto } from './create-tenant.dto';
+declare const UpdateTenantDto_base: import("@nestjs/common").Type<Partial<CreateTenantDto>>;
+export declare class UpdateTenantDto extends UpdateTenantDto_base {
 }
+export {};

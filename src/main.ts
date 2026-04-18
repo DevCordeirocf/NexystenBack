@@ -39,9 +39,25 @@ async function bootstrap() {
   // Configuração do Swagger (OpenAPI)
   const config = new DocumentBuilder()
     .setTitle('Nexysten API')
-    .setDescription('Documentação Nexysten - SaaS Multi-tenant')
-    .setVersion('1.0')
-    .addTag('Nexysten')
+    .setDescription(`
+      Documentação Nexysten - SaaS Multi-tenant para Joias
+      
+      Esta API gerencia múltiplas vitrines de joias de forma isolada.
+      
+      Instruções de Uso:
+      1. X-Tenant-ID: Todas as requisições de domínio (produtos, categorias, leads) exigem este header. Você pode usar o UUID ou o nome (subdomínio) da loja.
+      2. Autenticação: Use o endpoint \`/auth/login\` para obter o token Bearer.
+      3. Uploads: Imagens devem ser enviadas primeiro para \`/upload/image\` e a URL retornada deve ser usada nos produtos.
+    `)
+    .setVersion('1.1')
+    .addTag('Desenvolvimento', 'Ferramentas de auxílio ao front-end (Seed e Reset)')
+    .addTag('Autenticação', 'Endpoints de login e registro de usuários')
+    .addTag('Tenants Públicos', 'Configurações iniciais da loja para a vitrine')
+    .addTag('Produtos', 'Gestão e visualização de joias')
+    .addTag('Categorias', 'Organização de produtos')
+    .addTag('Solicitações de Contato', 'Geração de leads para os lojistas')
+    .addTag('Upload de Imagens', 'Serviço de armazenamento de mídia')
+    .addTag('Administração Master', 'Gestão global de tenants (Apenas Super Admin)')
     .addBearerAuth()
     .addApiKey({ type: 'apiKey', name: 'X-Tenant-ID', in: 'header' }, 'X-Tenant-ID')
     .build();

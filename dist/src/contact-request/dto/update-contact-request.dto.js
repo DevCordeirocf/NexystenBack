@@ -11,18 +11,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateContactRequestDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class UpdateContactRequestDto {
     status;
     internalNotes;
 }
 exports.UpdateContactRequestDto = UpdateContactRequestDto;
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Status da solicitação', enum: ['PENDING', 'CONTACTED', 'CLOSED'], example: 'CONTACTED' }),
     (0, class_validator_1.IsString)({ message: 'O status deve ser uma string.' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsIn)(['PENDING', 'CONTACTED', 'CLOSED'], { message: 'O status deve ser PENDING, CONTACTED ou CLOSED.' }),
     __metadata("design:type", String)
 ], UpdateContactRequestDto.prototype, "status", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Notas internas para acompanhamento', example: 'Cliente agendou visita para terça-feira.' }),
     (0, class_validator_1.IsString)({ message: 'As notas internas devem ser uma string.' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

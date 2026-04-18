@@ -53,7 +53,7 @@ let TenantAdminService = class TenantAdminService {
         this.prisma = prisma;
     }
     async create(createTenantDto) {
-        const { name, isActive, themeConfig, logoUrl, whatsappNumber, adminEmail, adminPassword } = createTenantDto;
+        const { name, isActive, themeConfig, logoUrl, whatsapp, adminEmail, adminPassword } = createTenantDto;
         const existingTenant = await this.prisma.tenantStore.findUnique({ where: { name } });
         if (existingTenant) {
             throw new common_1.BadRequestException(`Já existe uma loja cadastrada com o nome '${name}'.`);
@@ -65,7 +65,7 @@ let TenantAdminService = class TenantAdminService {
                     isActive,
                     themeConfig,
                     logoUrl,
-                    whatsapp: whatsappNumber,
+                    whatsapp,
                 },
             });
             if (adminEmail && adminPassword) {
@@ -102,14 +102,14 @@ let TenantAdminService = class TenantAdminService {
         return tenant;
     }
     async update(id, updateTenantDto) {
-        const { logoUrl, whatsappNumber, ...dataToUpdate } = updateTenantDto;
+        const { logoUrl, whatsapp, ...dataToUpdate } = updateTenantDto;
         await this.findOne(id);
         return this.prisma.tenantStore.update({
             where: { id },
             data: {
                 ...dataToUpdate,
                 logoUrl,
-                whatsapp: whatsappNumber,
+                whatsapp,
             },
         });
     }

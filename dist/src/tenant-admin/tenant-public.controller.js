@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TenantPublicController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const prisma_service_1 = require("../database/prisma.service");
 let TenantPublicController = class TenantPublicController {
     prisma;
@@ -41,12 +42,14 @@ let TenantPublicController = class TenantPublicController {
 exports.TenantPublicController = TenantPublicController;
 __decorate([
     (0, common_1.Get)(':name'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obter configurações públicas de um tenant pelo nome (subdomínio)' }),
     __param(0, (0, common_1.Param)('name')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], TenantPublicController.prototype, "findByName", null);
 exports.TenantPublicController = TenantPublicController = __decorate([
+    (0, swagger_1.ApiTags)('Tenants Públicos'),
     (0, common_1.Controller)('tenants/public'),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], TenantPublicController);

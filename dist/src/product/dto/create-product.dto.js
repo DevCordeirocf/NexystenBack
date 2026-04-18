@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateProductDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class CreateProductDto {
     name;
     description;
@@ -23,18 +24,22 @@ class CreateProductDto {
 }
 exports.CreateProductDto = CreateProductDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Nome do produto', example: 'Anel de Ouro 18k' }),
     (0, class_validator_1.IsString)({ message: 'O nome do produto deve ser uma string.' }),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "name", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Descrição detalhada do produto', example: 'Anel elegante em ouro 18k com diamante' }),
     (0, class_validator_1.IsString)({ message: 'A descrição do produto deve ser uma string.' }),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "description", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Preço do produto', example: 1500.00 }),
     (0, class_validator_1.IsNumber)({}, { message: 'O preço deve ser um número.' }),
     __metadata("design:type", Number)
 ], CreateProductDto.prototype, "price", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Lista de URLs das imagens do produto', example: ['https://exemplo.com/imagem1.jpg'] }),
     (0, class_validator_1.IsArray)({ message: 'As imagens devem ser um array.' }),
     (0, class_validator_1.IsString)({ each: true, message: 'Cada imagem deve ser uma URL em formato de string.' }),
     __metadata("design:type", Array)
@@ -54,6 +59,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], CreateProductDto.prototype, "isActive", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Lista de IDs das categorias associadas', example: ['uuid-categoria-1'] }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsArray)({ message: 'Os categoryIds devem ser um array.' }),
     (0, class_validator_1.IsString)({ each: true, message: 'Cada categoryId deve ser um UUID em formato de string.' }),

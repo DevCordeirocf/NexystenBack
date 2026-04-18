@@ -3,7 +3,7 @@ export declare class CreateTenantDto {
     isActive?: boolean;
     themeConfig?: Record<string, any>;
     logoUrl?: string;
-    whatsappNumber?: string;
+    whatsapp?: string;
     adminEmail?: string;
     adminPassword?: string;
 }

@@ -11,22 +11,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateTenantDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class CreateTenantDto {
     name;
     isActive;
     themeConfig;
     logoUrl;
-    whatsappNumber;
+    whatsapp;
     adminEmail;
     adminPassword;
 }
 exports.CreateTenantDto = CreateTenantDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Nome/Subdomínio do tenant', example: 'loja-do-luis' }),
     (0, class_validator_1.IsString)({ message: 'O nome do tenant deve ser uma string.' }),
     (0, class_validator_1.IsNotEmpty)({ message: 'O nome do tenant não pode ser vazio.' }),
     __metadata("design:type", String)
 ], CreateTenantDto.prototype, "name", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Define se o tenant está ativo', default: true }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)({ message: 'isActive deve ser um valor booleano.' }),
     __metadata("design:type", Boolean)
@@ -36,15 +39,17 @@ __decorate([
     __metadata("design:type", Object)
 ], CreateTenantDto.prototype, "themeConfig", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'URL da logomarca do tenant', example: 'https://exemplo.com/logo.png' }),
     (0, class_validator_1.IsString)({ message: 'A URL da logo deve ser uma string.' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateTenantDto.prototype, "logoUrl", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Número de WhatsApp para contato', example: '5511999999999' }),
     (0, class_validator_1.IsString)({ message: 'O número do WhatsApp deve ser uma string.' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], CreateTenantDto.prototype, "whatsappNumber", void 0);
+], CreateTenantDto.prototype, "whatsapp", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEmail)({}, { message: 'O email do administrador deve ser um endereço de e-mail válido.' }),

@@ -1,13 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post, Param, HttpCode, HttpStatus, NotFoundException } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { PrismaService } from '../database/prisma.service';
 import { Public } from '../auth/public.decorator';
 
 /**
  * Controller exclusivo para auxiliar o desenvolvimento do Front-end.
- * Fornece dados básicos de tenants sem necessidade de autenticação ou Tenant-ID.
+ * Fornece ferramentas de seed e reset para facilitar testes.
  */
-@ApiTags('Desenvolvimento (Facilitado)')
+@ApiTags('Desenvolvimento')
 @Public()
 @Controller('dev/tenants')
 export class TenantDevController {
@@ -21,6 +21,134 @@ export class TenantDevController {
         id: true,
         name: true,
         isActive: true,
+      },
+    });
+  }
+
+  @Post('reset/:tenantId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Limpar todos os dados de um tenant (Produtos, Categorias, Leads)' })
+  async resetTenant(@Param('tenantId') tenantId: string) {
+    const tenant = await this.prisma.tenantStore.findUnique({ where: { id: tenantId } });
+    if (!tenant) throw new NotFoundException('Tenant não encontrado');
+
+    await this.prisma.$transaction([
+      this.prisma.contactRequest.deleteMany({ where: { tenantId } }),
+      this.prisma.product.deleteMany({ where: { tenantId } }),
+      this.prisma.category.deleteMany({ where: { tenantId } }),
+    ]);
+
+    return { message: `Dados do tenant ${tenant.name} foram resetados com sucesso.` };
+  }
+
+  @Post('seed/:tenantId')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Popular tenant com dados de teste (Joias)' })
+  async seedTenant(@Param('tenantId') tenantId: string) {
+    const tenant = await this.prisma.tenantStore.findUnique({ where: { id: tenantId } });
+    if (!tenant) throw new NotFoundException('Tenant não encontrado');
+
+    return this.prisma.$transaction(async (tx) => {
+      // 1. Criar Categorias
+      const catAneis = await tx.category.create({
+        data: { name: 'Anéis', description: 'Anéis de ouro e prata', tenantId }
+      });
+      const catColares = await tx.category.create({
+        data: { name: 'Colares', description: 'Colares e gargantilhas', tenantId }
+      });
+
+      // 2. Criar Produtos
+      const p1 = await tx.product.create({
+        data: {
+          name: 'Anel Solitário Diamante',
+          description: 'Anel clássico em ouro 18k com diamante de 15 pontos.',
+          price: 2500.00,
+          stock: 5,
+          images: ['https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500'],
+          tenantId,
+          categories: { connect: { id: catAneis.id } }
+        }
+      });
+
+      const p2 = await tx.product.create({
+        data: {
+          name: 'Colar de Pérolas',
+          description: 'Colar elegante com pérolas naturais e fecho em prata.',
+          price: 850.00,
+          stock: 10,
+          images: ['https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500'],
+          tenantId,
+          categories: { connect: { id: catColares.id } }
+        }
+      });
+
+      // 3. Criar Leads (Contact Requests)
+      await tx.contactRequest.create({
+        data: {
+          tenantId,
+          productId: p1.id,
+          customerName: 'João Silva (Teste)',
+          customerEmail: 'joao.teste@email.com',
+          customerPhone: '11999999999',
+          message: 'Tenho interesse neste anel, qual o prazo de entrega?',
+          status: 'PENDING'
+        }
+      });
+
+      return { 
+        message: `Seed finalizado para ${tenant.name}`,
+        data: {
+          categories: 2,
+          products: 2,
+          leads: 1
+        }
+      };
+    });
+  }
+
+  @Get('all-users')
+  @ApiOperation({ summary: 'Listar todos os usuários do sistema (Debug)' })
+  async findAllUsers() {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        tenantId: true,
+        createdAt: true,
+      },
+    });
+  }
+
+  @Get('all-products')
+  @ApiOperation({ summary: 'Listar todos os produtos de todos os tenants (Debug)' })
+  async findAllProducts() {
+    return this.prisma.product.findMany({
+      include: {
+        tenant: { select: { name: true } },
+        categories: { select: { name: true } },
+      },
+    });
+  }
+
+  @Get('all-categories')
+  @ApiOperation({ summary: 'Listar todas as categorias de todos os tenants (Debug)' })
+  async findAllCategories() {
+    return this.prisma.category.findMany({
+      include: {
+        tenant: { select: { name: true } },
+      },
+    });
+  }
+
+  @Get('all-leads')
+  @ApiOperation({ summary: 'Listar todas as solicitações de contato de todos os tenants (Debug)' })
+  async findAllLeads() {
+    return this.prisma.contactRequest.findMany({
+      include: {
+        tenant: { select: { name: true } },
+        product: { select: { name: true } },
       },
     });
   }

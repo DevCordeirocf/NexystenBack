@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterUserDto = void 0;
 const class_validator_1 = require("class-validator");
 const client_1 = require("@prisma/client");
+const swagger_1 = require("@nestjs/swagger");
 class RegisterUserDto {
     email;
     password;
@@ -22,15 +23,18 @@ class RegisterUserDto {
 }
 exports.RegisterUserDto = RegisterUserDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Endereço de e-mail do usuário', example: 'admin@nexysten.com' }),
     (0, class_validator_1.IsEmail)({}, { message: 'O email deve ser um endereço de e-mail válido.' }),
     __metadata("design:type", String)
 ], RegisterUserDto.prototype, "email", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Senha do usuário', example: 'senha123', minLength: 6 }),
     (0, class_validator_1.IsString)({ message: 'A senha deve ser uma string.' }),
     (0, class_validator_1.MinLength)(6, { message: 'A senha deve ter no mínimo 6 caracteres.' }),
     __metadata("design:type", String)
 ], RegisterUserDto.prototype, "password", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Nome completo do usuário', example: 'Luis Eduardo' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)({ message: 'O nome deve ser uma string.' }),
     __metadata("design:type", String)
@@ -41,6 +45,7 @@ __decorate([
     __metadata("design:type", String)
 ], RegisterUserDto.prototype, "phone", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ enum: client_1.UserRole, description: 'Papel do usuário no sistema', example: 'TENANT_ADMIN' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEnum)(client_1.UserRole, { message: 'A role deve ser MASTER_ADMIN, TENANT_ADMIN ou CUSTOMER.' }),
     __metadata("design:type", String)
