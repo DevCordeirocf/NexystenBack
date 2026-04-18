@@ -15,10 +15,14 @@ export class AuthService {
   ) {}
 
   /**
-   * Registra um novo usuário no sistema (Admin ou Lojista)
+   * Registra um novo MASTER_ADMIN (Apenas outro MASTER_ADMIN pode realizar esta ação)
    */
-  async register(registerUserDto: RegisterUserDto) {
-    const { email, password, role, tenantId, name, phone } = registerUserDto;
+  async registerMaster(registerMasterDto: any, currentUser: any) {
+    if (!currentUser || currentUser.role !== UserRole.MASTER_ADMIN) {
+      throw new UnauthorizedException('Apenas um MASTER_ADMIN pode criar outros administradores master.');
+    }
+
+    const { email, password, name } = registerMasterDto;
 
     const existingUser = await this.prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -27,36 +31,59 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Validações de vínculo com Tenant baseadas na Role
-    if (role === UserRole.MASTER_ADMIN && tenantId) {
-      throw new BadRequestException('Um MASTER_ADMIN não pode ser vinculado a um tenant específico.');
+    await this.prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        role: UserRole.MASTER_ADMIN,
+        name,
+      },
+    });
+
+    return { message: 'Administrador Master registrado com sucesso' };
+  }
+
+  /**
+   * Registra um novo TENANT_ADMIN vinculado a uma loja (Apenas MASTER_ADMIN pode realizar esta ação)
+   */
+  async registerTenantAdmin(registerTenantAdminDto: any, currentUser: any) {
+    if (!currentUser || currentUser.role !== UserRole.MASTER_ADMIN) {
+      throw new UnauthorizedException('Apenas um MASTER_ADMIN pode criar administradores de loja.');
     }
-    if (role === UserRole.TENANT_ADMIN && !tenantId) {
-      throw new BadRequestException('Um TENANT_ADMIN deve obrigatoriamente estar vinculado a um tenant.');
+
+    const { email, password, name, tenantId } = registerTenantAdminDto;
+
+    const existingUser = await this.prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      throw new BadRequestException('Já existe um usuário cadastrado com este e-mail.');
     }
+
+    const tenantExists = await this.prisma.tenantStore.findUnique({ where: { id: tenantId } });
+    if (!tenantExists) {
+      throw new BadRequestException('O tenant informado não existe.');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await this.prisma.user.create({
       data: {
         email,
         password: hashedPassword,
-        role: role || UserRole.CUSTOMER,
-        tenantId: (role === UserRole.TENANT_ADMIN || role === UserRole.CUSTOMER) ? tenantId : null,
+        role: UserRole.TENANT_ADMIN,
+        tenantId,
         name,
-        phone,
       },
     });
 
     // Vincula o administrador à loja correspondente
-    if (role === UserRole.TENANT_ADMIN && tenantId) {
-      await this.prisma.tenantStore.update({
-        where: { id: tenantId },
-        data: {
-          users: { connect: { id: user.id } },
-        },
-      });
-    }
+    await this.prisma.tenantStore.update({
+      where: { id: tenantId },
+      data: {
+        users: { connect: { id: user.id } },
+      },
+    });
 
-    return { message: 'Usuário registrado com sucesso' };
+    return { message: 'Administrador de Loja registrado com sucesso' };
   }
 
   /**

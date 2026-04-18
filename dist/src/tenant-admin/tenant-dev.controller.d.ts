@@ -22,9 +22,9 @@ export declare class TenantDevController {
         id: string;
         name: string | null;
         createdAt: Date;
-        tenantId: string | null;
         email: string;
         role: import(".prisma/client").$Enums.UserRole;
+        tenantId: string | null;
     }[]>;
     findAllProducts(): Promise<({
         categories: {
@@ -39,12 +39,12 @@ export declare class TenantDevController {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
+        tenantId: string;
         description: string;
         price: import("@prisma/client/runtime/library").Decimal;
         images: string[];
         specifications: import("@prisma/client/runtime/library").JsonValue | null;
         stock: number;
-        tenantId: string;
     })[]>;
     findAllCategories(): Promise<({
         tenant: {
@@ -55,8 +55,8 @@ export declare class TenantDevController {
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        description: string | null;
         tenantId: string;
+        description: string | null;
     })[]>;
     findAllLeads(): Promise<({
         product: {
@@ -68,8 +68,8 @@ export declare class TenantDevController {
     } & {
         id: string;
         createdAt: Date;
-        message: string | null;
         tenantId: string;
+        message: string | null;
         userId: string | null;
         productId: string;
         customerName: string;

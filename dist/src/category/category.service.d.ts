@@ -9,39 +9,39 @@ export declare class CategoryService {
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        description: string | null;
         tenantId: string;
+        description: string | null;
     }>;
     findAll(tenantId: string): Promise<{
         id: string;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        description: string | null;
         tenantId: string;
+        description: string | null;
     }[]>;
     findOne(id: string, tenantId: string): Promise<{
         id: string;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        description: string | null;
         tenantId: string;
+        description: string | null;
     }>;
     update(id: string, tenantId: string, updateCategoryDto: UpdateCategoryDto): Promise<{
         id: string;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        description: string | null;
         tenantId: string;
+        description: string | null;
     }>;
     remove(id: string, tenantId: string): Promise<{
         id: string;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        description: string | null;
         tenantId: string;
+        description: string | null;
     }>;
 }

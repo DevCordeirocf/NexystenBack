@@ -7,8 +7,8 @@ export declare class ContactRequestController {
     create(createContactRequestDto: CreateContactRequestDto, user?: any): Promise<{
         id: string;
         createdAt: Date;
-        message: string | null;
         tenantId: string;
+        message: string | null;
         userId: string | null;
         productId: string;
         customerName: string;
@@ -31,8 +31,8 @@ export declare class ContactRequestController {
     } & {
         id: string;
         createdAt: Date;
-        message: string | null;
         tenantId: string;
+        message: string | null;
         userId: string | null;
         productId: string;
         customerName: string;
@@ -53,18 +53,18 @@ export declare class ContactRequestController {
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
+            tenantId: string;
             description: string;
             price: import("@prisma/client/runtime/library").Decimal;
             images: string[];
             specifications: import("@prisma/client/runtime/library").JsonValue | null;
             stock: number;
-            tenantId: string;
         };
     } & {
         id: string;
         createdAt: Date;
-        message: string | null;
         tenantId: string;
+        message: string | null;
         userId: string | null;
         productId: string;
         customerName: string;
@@ -79,18 +79,18 @@ export declare class ContactRequestController {
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
+            tenantId: string;
             description: string;
             price: import("@prisma/client/runtime/library").Decimal;
             images: string[];
             specifications: import("@prisma/client/runtime/library").JsonValue | null;
             stock: number;
-            tenantId: string;
         };
     } & {
         id: string;
         createdAt: Date;
-        message: string | null;
         tenantId: string;
+        message: string | null;
         userId: string | null;
         productId: string;
         customerName: string;
@@ -101,8 +101,8 @@ export declare class ContactRequestController {
     remove(id: string): Promise<{
         id: string;
         createdAt: Date;
-        message: string | null;
         tenantId: string;
+        message: string | null;
         userId: string | null;
         productId: string;
         customerName: string;

@@ -9,51 +9,36 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RegisterUserDto = void 0;
+exports.RegisterTenantAdminDto = void 0;
 const class_validator_1 = require("class-validator");
-const client_1 = require("@prisma/client");
 const swagger_1 = require("@nestjs/swagger");
-class RegisterUserDto {
+class RegisterTenantAdminDto {
     email;
     password;
     name;
-    phone;
-    role;
     tenantId;
 }
-exports.RegisterUserDto = RegisterUserDto;
+exports.RegisterTenantAdminDto = RegisterTenantAdminDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Endereço de e-mail do usuário', example: 'admin@nexysten.com' }),
+    (0, swagger_1.ApiProperty)({ description: 'Endereço de e-mail do administrador da loja', example: 'loja@email.com' }),
     (0, class_validator_1.IsEmail)({}, { message: 'O email deve ser um endereço de e-mail válido.' }),
     __metadata("design:type", String)
-], RegisterUserDto.prototype, "email", void 0);
+], RegisterTenantAdminDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Senha do usuário', example: 'senha123', minLength: 6 }),
+    (0, swagger_1.ApiProperty)({ description: 'Senha do administrador da loja', example: 'senha123', minLength: 6 }),
     (0, class_validator_1.IsString)({ message: 'A senha deve ser uma string.' }),
     (0, class_validator_1.MinLength)(6, { message: 'A senha deve ter no mínimo 6 caracteres.' }),
     __metadata("design:type", String)
-], RegisterUserDto.prototype, "password", void 0);
+], RegisterTenantAdminDto.prototype, "password", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Nome completo do usuário', example: 'Luis Eduardo' }),
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Nome completo do administrador', example: 'João Lojista' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)({ message: 'O nome deve ser uma string.' }),
     __metadata("design:type", String)
-], RegisterUserDto.prototype, "name", void 0);
+], RegisterTenantAdminDto.prototype, "name", void 0);
 __decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsPhoneNumber)('BR', { message: 'O telefone deve ser um número de telefone válido do Brasil.' }),
-    __metadata("design:type", String)
-], RegisterUserDto.prototype, "phone", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ enum: client_1.UserRole, description: 'Papel do usuário no sistema', example: 'TENANT_ADMIN' }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsEnum)(client_1.UserRole, { message: 'A role deve ser MASTER_ADMIN, TENANT_ADMIN ou CUSTOMER.' }),
-    __metadata("design:type", String)
-], RegisterUserDto.prototype, "role", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'ID do tenant (Obrigatório para TENANT_ADMIN e CUSTOMER)', example: 'uuid-do-tenant' }),
-    (0, class_validator_1.IsOptional)(),
+    (0, swagger_1.ApiProperty)({ description: 'ID do tenant ao qual este administrador pertence', example: 'uuid-do-tenant' }),
     (0, class_validator_1.IsUUID)('4', { message: 'O tenantId deve ser um UUID válido.' }),
     __metadata("design:type", String)
-], RegisterUserDto.prototype, "tenantId", void 0);
-//# sourceMappingURL=register-user.dto.js.map
+], RegisterTenantAdminDto.prototype, "tenantId", void 0);
+//# sourceMappingURL=register-tenant-admin.dto.js.map

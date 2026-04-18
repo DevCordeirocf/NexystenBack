@@ -9,8 +9,8 @@ export declare class ContactRequestService {
     create(createContactRequestDto: CreateContactRequestDto): Promise<{
         id: string;
         createdAt: Date;
-        message: string | null;
         tenantId: string;
+        message: string | null;
         userId: string | null;
         productId: string;
         customerName: string;
@@ -33,8 +33,8 @@ export declare class ContactRequestService {
     } & {
         id: string;
         createdAt: Date;
-        message: string | null;
         tenantId: string;
+        message: string | null;
         userId: string | null;
         productId: string;
         customerName: string;
@@ -55,18 +55,18 @@ export declare class ContactRequestService {
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
+            tenantId: string;
             description: string;
             price: import("@prisma/client/runtime/library").Decimal;
             images: string[];
             specifications: import("@prisma/client/runtime/library").JsonValue | null;
             stock: number;
-            tenantId: string;
         };
     } & {
         id: string;
         createdAt: Date;
-        message: string | null;
         tenantId: string;
+        message: string | null;
         userId: string | null;
         productId: string;
         customerName: string;
@@ -81,18 +81,18 @@ export declare class ContactRequestService {
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
+            tenantId: string;
             description: string;
             price: import("@prisma/client/runtime/library").Decimal;
             images: string[];
             specifications: import("@prisma/client/runtime/library").JsonValue | null;
             stock: number;
-            tenantId: string;
         };
     } & {
         id: string;
         createdAt: Date;
-        message: string | null;
         tenantId: string;
+        message: string | null;
         userId: string | null;
         productId: string;
         customerName: string;
@@ -103,8 +103,8 @@ export declare class ContactRequestService {
     remove(id: string): Promise<{
         id: string;
         createdAt: Date;
-        message: string | null;
         tenantId: string;
+        message: string | null;
         userId: string | null;
         productId: string;
         customerName: string;

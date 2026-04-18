@@ -12,8 +12,8 @@ export declare class ProductController {
             name: string;
             createdAt: Date;
             updatedAt: Date;
-            description: string | null;
             tenantId: string;
+            description: string | null;
         }[];
     } & {
         id: string;
@@ -21,12 +21,12 @@ export declare class ProductController {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
+        tenantId: string;
         description: string;
         price: import("@prisma/client/runtime/library").Decimal;
         images: string[];
         specifications: import("@prisma/client/runtime/library").JsonValue | null;
         stock: number;
-        tenantId: string;
     }>;
     findAll(categoryId?: string, user?: User): Promise<({
         categories: {
@@ -34,8 +34,8 @@ export declare class ProductController {
             name: string;
             createdAt: Date;
             updatedAt: Date;
-            description: string | null;
             tenantId: string;
+            description: string | null;
         }[];
     } & {
         id: string;
@@ -43,12 +43,12 @@ export declare class ProductController {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
+        tenantId: string;
         description: string;
         price: import("@prisma/client/runtime/library").Decimal;
         images: string[];
         specifications: import("@prisma/client/runtime/library").JsonValue | null;
         stock: number;
-        tenantId: string;
     })[]>;
     findOne(id: string): Promise<{
         categories: {
@@ -56,8 +56,8 @@ export declare class ProductController {
             name: string;
             createdAt: Date;
             updatedAt: Date;
-            description: string | null;
             tenantId: string;
+            description: string | null;
         }[];
     } & {
         id: string;
@@ -65,12 +65,12 @@ export declare class ProductController {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
+        tenantId: string;
         description: string;
         price: import("@prisma/client/runtime/library").Decimal;
         images: string[];
         specifications: import("@prisma/client/runtime/library").JsonValue | null;
         stock: number;
-        tenantId: string;
     }>;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
         categories: {
@@ -78,8 +78,8 @@ export declare class ProductController {
             name: string;
             createdAt: Date;
             updatedAt: Date;
-            description: string | null;
             tenantId: string;
+            description: string | null;
         }[];
     } & {
         id: string;
@@ -87,12 +87,12 @@ export declare class ProductController {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
+        tenantId: string;
         description: string;
         price: import("@prisma/client/runtime/library").Decimal;
         images: string[];
         specifications: import("@prisma/client/runtime/library").JsonValue | null;
         stock: number;
-        tenantId: string;
     }>;
     updateStockAndAvailability(id: string, updateStockAvailabilityDto: UpdateStockAvailabilityDto): Promise<{
         categories: {
@@ -100,8 +100,8 @@ export declare class ProductController {
             name: string;
             createdAt: Date;
             updatedAt: Date;
-            description: string | null;
             tenantId: string;
+            description: string | null;
         }[];
     } & {
         id: string;
@@ -109,12 +109,12 @@ export declare class ProductController {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
+        tenantId: string;
         description: string;
         price: import("@prisma/client/runtime/library").Decimal;
         images: string[];
         specifications: import("@prisma/client/runtime/library").JsonValue | null;
         stock: number;
-        tenantId: string;
     }>;
     remove(id: string): Promise<{
         id: string;
@@ -122,11 +122,11 @@ export declare class ProductController {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
+        tenantId: string;
         description: string;
         price: import("@prisma/client/runtime/library").Decimal;
         images: string[];
         specifications: import("@prisma/client/runtime/library").JsonValue | null;
         stock: number;
-        tenantId: string;
     }>;
 }

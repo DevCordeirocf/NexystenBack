@@ -55,38 +55,56 @@ let AuthService = class AuthService {
         this.prisma = prisma;
         this.jwtService = jwtService;
     }
-    async register(registerUserDto) {
-        const { email, password, role, tenantId, name, phone } = registerUserDto;
+    async registerMaster(registerMasterDto, currentUser) {
+        if (!currentUser || currentUser.role !== client_1.UserRole.MASTER_ADMIN) {
+            throw new common_1.UnauthorizedException('Apenas um MASTER_ADMIN pode criar outros administradores master.');
+        }
+        const { email, password, name } = registerMasterDto;
         const existingUser = await this.prisma.user.findUnique({ where: { email } });
         if (existingUser) {
             throw new common_1.BadRequestException('Já existe um usuário cadastrado com este e-mail.');
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        if (role === client_1.UserRole.MASTER_ADMIN && tenantId) {
-            throw new common_1.BadRequestException('Um MASTER_ADMIN não pode ser vinculado a um tenant específico.');
+        await this.prisma.user.create({
+            data: {
+                email,
+                password: hashedPassword,
+                role: client_1.UserRole.MASTER_ADMIN,
+                name,
+            },
+        });
+        return { message: 'Administrador Master registrado com sucesso' };
+    }
+    async registerTenantAdmin(registerTenantAdminDto, currentUser) {
+        if (!currentUser || currentUser.role !== client_1.UserRole.MASTER_ADMIN) {
+            throw new common_1.UnauthorizedException('Apenas um MASTER_ADMIN pode criar administradores de loja.');
         }
-        if (role === client_1.UserRole.TENANT_ADMIN && !tenantId) {
-            throw new common_1.BadRequestException('Um TENANT_ADMIN deve obrigatoriamente estar vinculado a um tenant.');
+        const { email, password, name, tenantId } = registerTenantAdminDto;
+        const existingUser = await this.prisma.user.findUnique({ where: { email } });
+        if (existingUser) {
+            throw new common_1.BadRequestException('Já existe um usuário cadastrado com este e-mail.');
         }
+        const tenantExists = await this.prisma.tenantStore.findUnique({ where: { id: tenantId } });
+        if (!tenantExists) {
+            throw new common_1.BadRequestException('O tenant informado não existe.');
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
         const user = await this.prisma.user.create({
             data: {
                 email,
                 password: hashedPassword,
-                role: role || client_1.UserRole.CUSTOMER,
-                tenantId: (role === client_1.UserRole.TENANT_ADMIN || role === client_1.UserRole.CUSTOMER) ? tenantId : null,
+                role: client_1.UserRole.TENANT_ADMIN,
+                tenantId,
                 name,
-                phone,
             },
         });
-        if (role === client_1.UserRole.TENANT_ADMIN && tenantId) {
-            await this.prisma.tenantStore.update({
-                where: { id: tenantId },
-                data: {
-                    users: { connect: { id: user.id } },
-                },
-            });
-        }
-        return { message: 'Usuário registrado com sucesso' };
+        await this.prisma.tenantStore.update({
+            where: { id: tenantId },
+            data: {
+                users: { connect: { id: user.id } },
+            },
+        });
+        return { message: 'Administrador de Loja registrado com sucesso' };
     }
     async registerCustomer(registerCustomerDto, tenantId) {
         const { email, password, name, phone } = registerCustomerDto;

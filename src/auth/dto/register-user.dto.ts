@@ -26,6 +26,7 @@ export class RegisterUserDto {
   @IsEnum(UserRole, { message: 'A role deve ser MASTER_ADMIN, TENANT_ADMIN ou CUSTOMER.' })
   role?: UserRole;
 
+  @ApiPropertyOptional({ description: 'ID do tenant (Obrigatório para TENANT_ADMIN e CUSTOMER)', example: 'uuid-do-tenant' })
   @IsOptional()
   @IsUUID('4', { message: 'O tenantId deve ser um UUID válido.' })
   tenantId?: string;

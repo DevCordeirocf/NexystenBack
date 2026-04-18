@@ -13,8 +13,8 @@ export declare class ProductService {
             name: string;
             createdAt: Date;
             updatedAt: Date;
-            description: string | null;
             tenantId: string;
+            description: string | null;
         }[];
     } & {
         id: string;
@@ -22,12 +22,12 @@ export declare class ProductService {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
+        tenantId: string;
         description: string;
         price: import("@prisma/client/runtime/library").Decimal;
         images: string[];
         specifications: import("@prisma/client/runtime/library").JsonValue | null;
         stock: number;
-        tenantId: string;
     }>;
     findAll(categoryId?: string, userRole?: UserRole): Promise<({
         categories: {
@@ -35,8 +35,8 @@ export declare class ProductService {
             name: string;
             createdAt: Date;
             updatedAt: Date;
-            description: string | null;
             tenantId: string;
+            description: string | null;
         }[];
     } & {
         id: string;
@@ -44,12 +44,12 @@ export declare class ProductService {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
+        tenantId: string;
         description: string;
         price: import("@prisma/client/runtime/library").Decimal;
         images: string[];
         specifications: import("@prisma/client/runtime/library").JsonValue | null;
         stock: number;
-        tenantId: string;
     })[]>;
     findOne(id: string): Promise<{
         categories: {
@@ -57,8 +57,8 @@ export declare class ProductService {
             name: string;
             createdAt: Date;
             updatedAt: Date;
-            description: string | null;
             tenantId: string;
+            description: string | null;
         }[];
     } & {
         id: string;
@@ -66,12 +66,12 @@ export declare class ProductService {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
+        tenantId: string;
         description: string;
         price: import("@prisma/client/runtime/library").Decimal;
         images: string[];
         specifications: import("@prisma/client/runtime/library").JsonValue | null;
         stock: number;
-        tenantId: string;
     }>;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
         categories: {
@@ -79,8 +79,8 @@ export declare class ProductService {
             name: string;
             createdAt: Date;
             updatedAt: Date;
-            description: string | null;
             tenantId: string;
+            description: string | null;
         }[];
     } & {
         id: string;
@@ -88,12 +88,12 @@ export declare class ProductService {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
+        tenantId: string;
         description: string;
         price: import("@prisma/client/runtime/library").Decimal;
         images: string[];
         specifications: import("@prisma/client/runtime/library").JsonValue | null;
         stock: number;
-        tenantId: string;
     }>;
     remove(id: string): Promise<{
         id: string;
@@ -101,12 +101,12 @@ export declare class ProductService {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
+        tenantId: string;
         description: string;
         price: import("@prisma/client/runtime/library").Decimal;
         images: string[];
         specifications: import("@prisma/client/runtime/library").JsonValue | null;
         stock: number;
-        tenantId: string;
     }>;
     updateStockAndAvailability(id: string, stock?: number, isActive?: boolean): Promise<{
         categories: {
@@ -114,8 +114,8 @@ export declare class ProductService {
             name: string;
             createdAt: Date;
             updatedAt: Date;
-            description: string | null;
             tenantId: string;
+            description: string | null;
         }[];
     } & {
         id: string;
@@ -123,11 +123,11 @@ export declare class ProductService {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
+        tenantId: string;
         description: string;
         price: import("@prisma/client/runtime/library").Decimal;
         images: string[];
         specifications: import("@prisma/client/runtime/library").JsonValue | null;
         stock: number;
-        tenantId: string;
     }>;
 }

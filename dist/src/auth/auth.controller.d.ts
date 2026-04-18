@@ -1,11 +1,15 @@
 import { AuthService } from './auth.service';
-import { RegisterUserDto } from './dto/register-user.dto';
+import { RegisterMasterDto } from './dto/register-master.dto';
+import { RegisterTenantAdminDto } from './dto/register-tenant-admin.dto';
 import { RegisterCustomerDto } from './dto/register-customer.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
-    register(registerUserDto: RegisterUserDto): Promise<{
+    registerMaster(registerMasterDto: RegisterMasterDto, currentUser: any): Promise<{
+        message: string;
+    }>;
+    registerTenantAdmin(registerTenantAdminDto: RegisterTenantAdminDto, currentUser: any): Promise<{
         message: string;
     }>;
     registerCustomer(registerCustomerDto: RegisterCustomerDto, tenantId: string): Promise<{
