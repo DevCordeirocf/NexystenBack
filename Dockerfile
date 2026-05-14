@@ -15,7 +15,6 @@ RUN npm install --legacy-peer-deps
 
 # Copia o restante do código e faz o build
 COPY . .
-RUN npx prisma generate
 RUN npm run build
 
 # Stage 2: Runtime
@@ -35,10 +34,8 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 
 # O Render injeta a porta automaticamente na variável PORT
-# Se não houver, o NestJS costuma usar 3001 no seu projeto
 ENV PORT=3001
 EXPOSE $PORT
 
 # Comando para rodar as migrações e iniciar o servidor
-# No Render (Free), o comando precisa ser direto para evitar timeouts
-CMD npx prisma migrate deploy && node dist/src/main.js
+CMD npx prisma generate && npx prisma migrate deploy && node dist/src/main.js
