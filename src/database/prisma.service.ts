@@ -1,43 +1,31 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
-import { TenantContextService } from '../tenant/tenant-context.service';
+import '../config/load-env';
 
-/**
- * Serviço responsável pela conexão com o banco de dados via Prisma.
- * Implementa o isolamento multi-tenant através de middlewares.
- */
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
-  constructor(private readonly tenantContextService: TenantContextService) {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
+  constructor() {
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL nao foi definida no ambiente.');
+    }
+
+    const adapter = new PrismaPg({
+      connectionString: process.env.DATABASE_URL,
+    });
+
     super({
-      log: ['error', 'warn'], // Logs de erro e avisos habilitados
+      adapter,
+      log: ['error', 'warn'],
     });
   }
 
   async onModuleInit() {
     await this.$connect();
-
-    // Middleware para isolamento automático de dados por Tenant
-    this.$use(async (params, next) => {
-      const tenantId = this.tenantContextService.getTenantId();
-
-      if (tenantId) {
-        // Modelos que requerem isolamento por Tenant
-        const modelsToIsolate = ["Product", "ContactRequest", "Category"];
-
-        if (params.model && modelsToIsolate.includes(params.model)) {
-          // Injeta o tenantId automaticamente em todas as operações de leitura e escrita
-          if (["findUnique", "findFirst", "findMany", "count", "update", "updateMany", "delete", "deleteMany"].includes(params.action)) {
-            params.args.where = { ...params.args.where, tenantId };
-          } else if (params.action === "create") {
-            params.args.data = { ...params.args.data, tenantId };
-          }
-        }
-      }
-      return next(params);
-    });
-
-    console.log("✅ Banco de Dados conectado e isolamento Multi-tenant ativado.");
+    console.log('Banco de Dados conectado.');
   }
 
   async onModuleDestroy() {

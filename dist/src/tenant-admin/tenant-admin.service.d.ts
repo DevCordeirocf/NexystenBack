@@ -7,10 +7,10 @@ export declare class TenantAdminService {
     create(createTenantDto: CreateTenantDto): Promise<{
         id: string;
         name: string;
-        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
+        isActive: boolean;
+        themeConfig: import("@prisma/client/runtime/client").JsonValue | null;
         logoUrl: string | null;
         whatsapp: string | null;
     }>;
@@ -22,10 +22,10 @@ export declare class TenantAdminService {
     } & {
         id: string;
         name: string;
-        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
+        isActive: boolean;
+        themeConfig: import("@prisma/client/runtime/client").JsonValue | null;
         logoUrl: string | null;
         whatsapp: string | null;
     })[]>;
@@ -37,30 +37,30 @@ export declare class TenantAdminService {
     } & {
         id: string;
         name: string;
-        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
+        isActive: boolean;
+        themeConfig: import("@prisma/client/runtime/client").JsonValue | null;
         logoUrl: string | null;
         whatsapp: string | null;
     }>;
     update(id: string, updateTenantDto: UpdateTenantDto): Promise<{
         id: string;
         name: string;
-        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
+        isActive: boolean;
+        themeConfig: import("@prisma/client/runtime/client").JsonValue | null;
         logoUrl: string | null;
         whatsapp: string | null;
     }>;
     remove(id: string): Promise<{
         id: string;
         name: string;
-        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        themeConfig: import("@prisma/client/runtime/library").JsonValue | null;
+        isActive: boolean;
+        themeConfig: import("@prisma/client/runtime/client").JsonValue | null;
         logoUrl: string | null;
         whatsapp: string | null;
     }>;

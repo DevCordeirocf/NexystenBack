@@ -11,8 +11,8 @@ export declare class ContactRequestService {
         createdAt: Date;
         tenantId: string;
         message: string | null;
-        userId: string | null;
         productId: string;
+        userId: string | null;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
@@ -35,8 +35,8 @@ export declare class ContactRequestService {
         createdAt: Date;
         tenantId: string;
         message: string | null;
-        userId: string | null;
         productId: string;
+        userId: string | null;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
@@ -52,23 +52,23 @@ export declare class ContactRequestService {
         product: {
             id: string;
             name: string;
-            isActive: boolean;
+            description: string;
             createdAt: Date;
             updatedAt: Date;
             tenantId: string;
-            description: string;
-            price: import("@prisma/client/runtime/library").Decimal;
-            images: string[];
-            specifications: import("@prisma/client/runtime/library").JsonValue | null;
+            isActive: boolean;
+            price: import("@prisma/client-runtime-utils").Decimal;
             stock: number;
+            images: string[];
+            specifications: import("@prisma/client/runtime/client").JsonValue | null;
         };
     } & {
         id: string;
         createdAt: Date;
         tenantId: string;
         message: string | null;
-        userId: string | null;
         productId: string;
+        userId: string | null;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
@@ -78,23 +78,23 @@ export declare class ContactRequestService {
         product: {
             id: string;
             name: string;
-            isActive: boolean;
+            description: string;
             createdAt: Date;
             updatedAt: Date;
             tenantId: string;
-            description: string;
-            price: import("@prisma/client/runtime/library").Decimal;
-            images: string[];
-            specifications: import("@prisma/client/runtime/library").JsonValue | null;
+            isActive: boolean;
+            price: import("@prisma/client-runtime-utils").Decimal;
             stock: number;
+            images: string[];
+            specifications: import("@prisma/client/runtime/client").JsonValue | null;
         };
     } & {
         id: string;
         createdAt: Date;
         tenantId: string;
         message: string | null;
-        userId: string | null;
         productId: string;
+        userId: string | null;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
@@ -105,8 +105,8 @@ export declare class ContactRequestService {
         createdAt: Date;
         tenantId: string;
         message: string | null;
-        userId: string | null;
         productId: string;
+        userId: string | null;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;

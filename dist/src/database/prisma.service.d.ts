@@ -1,9 +1,8 @@
-import { OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { TenantContextService } from '../tenant/tenant-context.service';
+import '../config/load-env';
 export declare class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
-    private readonly tenantContextService;
-    constructor(tenantContextService: TenantContextService);
+    constructor();
     onModuleInit(): Promise<void>;
     onModuleDestroy(): Promise<void>;
 }

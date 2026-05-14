@@ -11,34 +11,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaService = void 0;
 const common_1 = require("@nestjs/common");
+const adapter_pg_1 = require("@prisma/adapter-pg");
 const client_1 = require("@prisma/client");
-const tenant_context_service_1 = require("../tenant/tenant-context.service");
+require("../config/load-env");
 let PrismaService = class PrismaService extends client_1.PrismaClient {
-    tenantContextService;
-    constructor(tenantContextService) {
+    constructor() {
+        if (!process.env.DATABASE_URL) {
+            throw new Error('DATABASE_URL nao foi definida no ambiente.');
+        }
+        const adapter = new adapter_pg_1.PrismaPg({
+            connectionString: process.env.DATABASE_URL,
+        });
         super({
+            adapter,
             log: ['error', 'warn'],
         });
-        this.tenantContextService = tenantContextService;
     }
     async onModuleInit() {
         await this.$connect();
-        this.$use(async (params, next) => {
-            const tenantId = this.tenantContextService.getTenantId();
-            if (tenantId) {
-                const modelsToIsolate = ["Product", "ContactRequest", "Category"];
-                if (params.model && modelsToIsolate.includes(params.model)) {
-                    if (["findUnique", "findFirst", "findMany", "count", "update", "updateMany", "delete", "deleteMany"].includes(params.action)) {
-                        params.args.where = { ...params.args.where, tenantId };
-                    }
-                    else if (params.action === "create") {
-                        params.args.data = { ...params.args.data, tenantId };
-                    }
-                }
-            }
-            return next(params);
-        });
-        console.log("✅ Banco de Dados conectado e isolamento Multi-tenant ativado.");
+        console.log('Banco de Dados conectado.');
     }
     async onModuleDestroy() {
         await this.$disconnect();
@@ -47,6 +38,6 @@ let PrismaService = class PrismaService extends client_1.PrismaClient {
 exports.PrismaService = PrismaService;
 exports.PrismaService = PrismaService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [tenant_context_service_1.TenantContextService])
+    __metadata("design:paramtypes", [])
 ], PrismaService);
 //# sourceMappingURL=prisma.service.js.map

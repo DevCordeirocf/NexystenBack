@@ -6,7 +6,7 @@ export declare class TenantPublicController {
         id: string;
         name: string;
         isActive: boolean;
-        themeConfig: import("@prisma/client/runtime/library").JsonValue;
+        themeConfig: import("@prisma/client/runtime/client").JsonValue;
         logoUrl: string | null;
         whatsapp: string | null;
     }>;
