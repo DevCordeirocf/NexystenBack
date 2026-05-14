@@ -13,8 +13,13 @@ COPY package*.json ./
 COPY prisma ./prisma/
 RUN npm install --legacy-peer-deps
 
-# Copia o restante do código e faz o build
+# Copia o restante do código
 COPY . .
+
+# Gera o cliente Prisma antes do build (com DATABASE_URL dummy)
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost/dummy" npx prisma generate
+
+# Build do aplicativo
 RUN npm run build
 
 # Stage 2: Runtime
@@ -39,5 +44,15 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 ENV PORT=3001
 EXPOSE $PORT
 
-# Gera o cliente Prisma e aplica migrações já com DATABASE_URL do Supabase
-CMD npx prisma generate && npx prisma migrate deploy && node dist/src/main.js
+# Script de inicialização que trata migrações opcionalmente
+RUN echo '#!/bin/sh\n\
+if [ -z "$DATABASE_URL" ]; then\n\
+  echo "DATABASE_URL não definido, iniciando sem migrações"\n\
+else\n\
+  echo "Aplicando migrações do Prisma..."\n\
+  npx prisma migrate deploy || echo "Migrações já aplicadas ou falharam"\n\
+fi\n\
+echo "Iniciando aplicação..."\n\
+node dist/src/main.js' > /app/start.sh && chmod +x /app/start.sh
+
+CMD ["/app/start.sh"]

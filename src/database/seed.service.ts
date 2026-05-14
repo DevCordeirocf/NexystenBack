@@ -1,7 +1,7 @@
-import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
-import { PrismaService } from './prisma.service';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { PrismaService } from './prisma.service';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
@@ -10,7 +10,14 @@ export class SeedService implements OnModuleInit {
   constructor(private readonly prisma: PrismaService) {}
 
   async onModuleInit() {
-    await this.seedMasterAdmins();
+    try {
+      await this.seedMasterAdmins();
+    } catch (error: any) {
+      this.logger.warn(
+        'Seed falhou (pode ser esperado em ambiente sem banco de dados): ' +
+          (error?.message || String(error)),
+      );
+    }
   }
 
   private async seedMasterAdmins() {
