@@ -3,12 +3,12 @@ FROM node:20-slim AS builder
 
 WORKDIR /app
 
-# Instala dependências do sistema necessárias para o Prisma (OpenSSL)
+# Dependências necessárias para o Prisma
 RUN apt-get update && \
     apt-get install -y --no-install-recommends openssl libssl-dev ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Instala as dependências primeiro (aproveita o cache do Docker)
+# Instala dependências primeiro (cache otimizado)
 COPY package*.json ./
 COPY prisma ./prisma/
 RUN npm install --legacy-peer-deps
@@ -22,7 +22,7 @@ FROM node:20-slim AS runner
 
 WORKDIR /app
 
-# Instala dependências de sistema necessárias para o Prisma em tempo de execução
+# Dependências necessárias para o Prisma em tempo de execução
 RUN apt-get update && \
     apt-get install -y --no-install-recommends openssl ca-certificates && \
     rm -rf /var/lib/apt/lists/*
@@ -32,10 +32,12 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
-# O Render injeta a porta automaticamente na variável PORT
+# Porta padrão (Render injeta automaticamente a variável PORT)
 ENV PORT=3001
 EXPOSE $PORT
 
-# Comando para rodar as migrações e iniciar o servidor
+# Gera o cliente Prisma e aplica migrações já com DATABASE_URL do Supabase
 CMD npx prisma generate && npx prisma migrate deploy && node dist/src/main.js
