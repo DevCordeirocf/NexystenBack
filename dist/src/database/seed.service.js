@@ -45,9 +45,9 @@ var SeedService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SeedService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("./prisma.service");
 const client_1 = require("@prisma/client");
 const bcrypt = __importStar(require("bcryptjs"));
+const prisma_service_1 = require("./prisma.service");
 let SeedService = SeedService_1 = class SeedService {
     prisma;
     logger = new common_1.Logger(SeedService_1.name);
@@ -55,7 +55,13 @@ let SeedService = SeedService_1 = class SeedService {
         this.prisma = prisma;
     }
     async onModuleInit() {
-        await this.seedMasterAdmins();
+        try {
+            await this.seedMasterAdmins();
+        }
+        catch (error) {
+            this.logger.warn('Seed falhou (pode ser esperado em ambiente sem banco de dados): ' +
+                (error?.message || String(error)));
+        }
     }
     async seedMasterAdmins() {
         const masters = [

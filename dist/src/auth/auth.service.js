@@ -108,6 +108,9 @@ let AuthService = class AuthService {
     }
     async registerCustomer(registerCustomerDto, tenantId) {
         const { email, password, name, phone } = registerCustomerDto;
+        if (!tenantId) {
+            throw new common_1.BadRequestException('Tenant ID e obrigatorio para cadastrar um cliente.');
+        }
         const existingUser = await this.prisma.user.findFirst({
             where: { email, tenantId },
         });

@@ -1,6 +1,7 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import * as PrismaClientPkg from '@prisma/client';
+const { PrismaClient } = (PrismaClientPkg as any);
 import '../config/load-env';
 
 @Injectable()
@@ -21,11 +22,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   async onModuleInit() {
-    await this.$connect();
+    await super.$connect();
     console.log('✅ Prisma Client conectado ao PostgreSQL.');
   }
 
   async onModuleDestroy() {
-    await this.$disconnect();
+    await super.$disconnect();
   }
 }

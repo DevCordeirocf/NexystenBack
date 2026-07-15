@@ -26,7 +26,7 @@ import { Public } from '../auth/public.decorator';
  * Todas as rotas são protegidas por autenticação JWT e verificação de roles.
  */
 @ApiTags('Categorias')
-@ApiHeader({ name: 'X-Tenant-ID', description: 'ID ou nome do tenant', required: true })
+@ApiHeader({ name: 'X-Tenant-ID', description: 'ID ou nome do tenant para rotas publicas. Rotas autenticadas usam o tenantId do JWT.', required: false })
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('categories')

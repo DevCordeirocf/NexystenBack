@@ -24,7 +24,7 @@ import { UpdateStockAvailabilityDto } from './dto/update-stock-availability.dto'
 import { Public } from '../auth/public.decorator';
 
 @ApiTags('Produtos')
-@ApiHeader({ name: 'X-Tenant-ID', description: 'ID ou nome do tenant', required: true })
+@ApiHeader({ name: 'X-Tenant-ID', description: 'ID ou nome do tenant para rotas publicas. Rotas autenticadas usam o tenantId do JWT.', required: false })
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('products')
 export class ProductController {

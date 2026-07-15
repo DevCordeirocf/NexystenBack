@@ -23,7 +23,7 @@ import { UpdateContactRequestDto } from './dto/update-contact-request.dto';
 import { Public } from '../auth/public.decorator';
 
 @ApiTags('Solicitações de Contato')
-@ApiHeader({ name: 'X-Tenant-ID', description: 'ID ou nome do tenant', required: true })
+@ApiHeader({ name: 'X-Tenant-ID', description: 'ID ou nome do tenant para rotas publicas. Rotas autenticadas usam o tenantId do JWT.', required: false })
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('contact-requests')

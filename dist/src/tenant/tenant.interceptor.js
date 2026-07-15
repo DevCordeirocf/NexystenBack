@@ -24,32 +24,36 @@ let TenantInterceptor = class TenantInterceptor {
     intercept(context, next) {
         const request = context.switchToHttp().getRequest();
         const tenantHeader = request.headers['x-tenant-id'];
+        const authenticatedTenantId = request.user?.tenantId;
         const url = request.url;
-        const isPublicRoute = url.includes('/auth/login') ||
+        const isTenantOptionalRoute = url.includes('/auth/login') ||
             url.includes('/auth/register') ||
             url.includes('/tenant-admin') ||
             url.includes('/tenants/public') ||
             url.includes('/dev/tenants') ||
             url.includes('/api');
-        if (!tenantHeader && !isPublicRoute) {
-            throw new common_1.ForbiddenException('X-Tenant-ID é necessário no header');
+        const tenantIdentifier = authenticatedTenantId || tenantHeader;
+        if (!tenantIdentifier && !isTenantOptionalRoute) {
+            throw new common_1.ForbiddenException('Tenant ID nao disponivel no token ou no header X-Tenant-ID');
         }
         return new rxjs_1.Observable(subscriber => {
-            if (tenantHeader) {
-                this.resolveTenantId(tenantHeader).then(resolvedId => {
-                    if (!resolvedId && !isPublicRoute) {
-                        subscriber.error(new common_1.ForbiddenException('Tenant inválido ou não encontrado.'));
+            if (tenantIdentifier) {
+                this.resolveTenantId(tenantIdentifier)
+                    .then(resolvedId => {
+                    if (!resolvedId && !isTenantOptionalRoute) {
+                        subscriber.error(new common_1.ForbiddenException('Tenant invalido ou nao encontrado.'));
                         return;
                     }
                     if (resolvedId) {
+                        request.tenantId = resolvedId;
                         this.tenantContextService.run(resolvedId, () => {
                             this.executeNext(next, subscriber);
                         });
+                        return;
                     }
-                    else {
-                        this.executeNext(next, subscriber);
-                    }
-                }).catch(err => subscriber.error(err));
+                    this.executeNext(next, subscriber);
+                })
+                    .catch(err => subscriber.error(err));
             }
             else {
                 this.executeNext(next, subscriber);
@@ -58,18 +62,16 @@ let TenantInterceptor = class TenantInterceptor {
     }
     async resolveTenantId(identifier) {
         const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier);
-        if (isUuid)
-            return identifier;
         const tenant = await this.prisma.tenantStore.findUnique({
-            where: { name: identifier },
-            select: { id: true }
+            where: isUuid ? { id: identifier } : { name: identifier },
+            select: { id: true },
         });
         return tenant?.id || null;
     }
     executeNext(next, subscriber) {
         next.handle().subscribe({
-            next: (value) => subscriber.next(value),
-            error: (err) => subscriber.error(err),
+            next: value => subscriber.next(value),
+            error: err => subscriber.error(err),
             complete: () => subscriber.complete(),
         });
     }

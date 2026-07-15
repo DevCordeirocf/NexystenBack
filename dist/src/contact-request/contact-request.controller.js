@@ -98,7 +98,7 @@ __decorate([
 ], ContactRequestController.prototype, "remove", null);
 exports.ContactRequestController = ContactRequestController = __decorate([
     (0, swagger_1.ApiTags)('Solicitações de Contato'),
-    (0, swagger_1.ApiHeader)({ name: 'X-Tenant-ID', description: 'ID ou nome do tenant', required: true }),
+    (0, swagger_1.ApiHeader)({ name: 'X-Tenant-ID', description: 'ID ou nome do tenant para rotas publicas. Rotas autenticadas usam o tenantId do JWT.', required: false }),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, common_1.Controller)('contact-requests'),

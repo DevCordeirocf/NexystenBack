@@ -30,8 +30,8 @@ async function bootstrap() {
       Esta API gerencia múltiplas vitrines de joias de forma isolada.
       
       Instruções de Uso:
-      1. X-Tenant-ID: Todas as requisições de domínio (produtos, categorias, leads) exigem este header. Você pode usar o UUID ou o nome (subdomínio) da loja.
-      2. Autenticação: Use o endpoint \`/auth/login\` para obter o token Bearer.
+      1. Autenticação: Use o endpoint \`/auth/login\` para obter o token Bearer. Em rotas autenticadas, o tenant vem do JWT.
+      2. X-Tenant-ID: Use apenas em rotas públicas que precisam descobrir a loja antes do login. Você pode usar o UUID ou o nome (subdomínio) da loja.
       3. Uploads: Imagens devem ser enviadas primeiro para \`/upload/image\` e a URL retornada deve ser usada nos produtos.
     `)
         .setVersion('1.1')
