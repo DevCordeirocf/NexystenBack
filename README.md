@@ -1,245 +1,124 @@
-# NEXYSTEN MVP - Sistema SaaS Multi-tenant para Joias
 
-Bem-vindo ao **NEXYSTEN MVP**, uma plataforma simplificada de vitrine de joias com geração de leads, desenvolvida em **NestJS** com **PostgreSQL** e **Prisma**.
+---
+# Nexysten API - SaaS Multi-Tenant MVP
 
-## Objetivo
+> Backend para o sistema SaaS Nexysten, projetado para fornecer uma infraestrutura multi-tenant escalável e segura, voltada para pequenas empresas do segmento de varejo e vendas.
 
-Permitir que múltiplas empresas de joias operem suas próprias vitrines de forma isolada, com clientes interessados podendo solicitar contato direto com a empresa vendedora.
+O Nexysten API foi desenvolvido sobre uma arquitetura **Backend-Driven Multi-Tenant**, garantindo o isolamento integral de dados entre diferentes lojistas, controle de segurança centralizado e flexibilidade na gestão de cadastros.
 
-## Arquitetura
+## Tecnologias Utilizadas
 
-- **Backend**: NestJS 10.x
-- **ORM**: Prisma 5.x
-- **Banco de Dados**: PostgreSQL 16
-- **Containerização**: Docker Compose
-- **Linguagem**: TypeScript 5.x
+- **Framework:** [NestJS](https://nestjs.com/) (Node.js)
+- **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
+- **Banco de Dados:** [PostgreSQL](https://www.postgresql.org/)
+- **ORM:** [Prisma](https://www.prisma.io/)
+- **Autenticação:** JWT (JSON Web Tokens)
+- **Infraestrutura:** Docker e Docker Compose
+- **Documentação:** Swagger (OpenAPI)
 
-## 📁 Estrutura de Diretórios
+## Principais Funcionalidades
 
-```
-src/
-├── common/              # Utilitários compartilhados
-├── config/              # Configurações
-├── database/            # Prisma Service e Module
-├── tenant/              # Gerenciamento de contexto multi-tenant
-├── product/             # Módulo de Produtos (Joias)
-├── contact-request/     # Módulo de Solicitações de Contato
-├── app.module.ts        # Módulo raiz
-├── app.controller.ts    # Controller raiz
-├── app.service.ts       # Service raiz
-└── main.ts              # Bootstrap
-```
+- **Arquitetura Multi-Tenant Isolada:**
+  - Segregação de dados: Entidades como Produtos, Categorias, Clientes e Pedidos são filtradas de forma automática pelo contexto da loja (`tenantId`).
+  - **Identidade Contextualizada:** O modelo de dados permite que o mesmo endereço de e-mail seja utilizado para criar contas em lojas distintas, sem gerar conflitos de integridade (`@@unique([tenantId, email])`).
+  - **Segurança Backend-Driven:** O contexto de autorização do usuário (vínculo com a loja) é injetado no token JWT no momento do login. As rotas autenticadas não dependem de headers customizados enviados pelo frontend, o que previne vulnerabilidades como *spoofing* de tenant.
+- **Controle de Acesso Baseado em Regras (RBAC):** Sistema de hierarquia de permissões estruturado com as *roles* `MASTER_ADMIN`, `TENANT_ADMIN` e `CUSTOMER`.
+- **Gestão de Lojas (Tenants):** Configuração pública de lojas, incluindo upload de logomarca, informações de contato e personalização de tema.
+- **Catálogo de Vendas:** Operações de CRUD completas para gestão de Produtos (incluindo controle de estoque e status de visibilidade) e Categorias.
 
-## Quick Start
+## Funcionamento do Contexto Multi-Tenant
 
-### 1. Clonar o Repositório
+A resolução do tenant (loja) opera sob duas abordagens distintas, dependendo do estado de autenticação da requisição:
 
+1. **Rotas Públicas (Vitrine, Cadastro e Login):** 
+   O cliente (frontend) é obrigado a enviar o header `X-Tenant-ID` contendo o ID ou o slug de identificação da loja. Esta informação permite ao backend carregar o contexto correto antes da existência de uma sessão.
+2. **Rotas Autenticadas:** 
+   O header `X-Tenant-ID` é estritamente ignorado. O backend extrai o parâmetro `tenantId` de maneira segura, decodificando-o diretamente do token JWT enviado via header padrão (`Authorization: Bearer <token>`).
+
+## Execução do Projeto Localmente
+
+### 1. Pré-requisitos
+- [Node.js](https://nodejs.org/) (versão 18 ou superior recomendada)
+- [Docker](https://www.docker.com/) e Docker Compose
+- Git
+
+### 2. Instalação e Configuração
+
+Clone o repositório e instale as dependências da aplicação:
 ```bash
-git clone https://github.com/DevCordeirocf/Nexysten.git
-cd Nexysten
-```
-
-### 2. Instalar Dependências
-
-```bash
+git clone [https://github.com/seu-usuario/nexystenback.git](https://github.com/seu-usuario/nexystenback.git)
+cd nexystenback
 npm install
+
 ```
 
-### 3. Configurar Variáveis de Ambiente
+### 3. Variáveis de Ambiente
+
+Crie um arquivo `.env` no diretório raiz do projeto, utilizando o `.env.example` como referência. Certifique-se de configurar os seguintes parâmetros obrigatórios:
+
+```env
+DATABASE_URL="postgresql://usuario:senha@localhost:5432/nexysten_db?schema=public"
+JWT_SECRET="sua_chave_secreta_aqui"
+
+```
+
+### 4. Inicialização do Banco de Dados
+
+Utilize o Docker Compose para instanciar o contêiner do PostgreSQL:
 
 ```bash
-cp .env.example .env
+docker-compose up -d
+
 ```
 
-### 4. Iniciar o Banco de Dados
+### 5. Execução das Migrations
 
-```bash
-docker-compose up -d db
-```
-
-### 5. Executar Migrations
+Sincronize a estrutura lógica do banco de dados utilizando o Prisma ORM:
 
 ```bash
 npx prisma migrate dev
+
 ```
 
-### 6. Iniciar o Servidor
+*(Opcional)* Para popular o banco com dados de teste e usuários padrão, execute o processo de seed:
 
 ```bash
+npx prisma db seed
+
+```
+
+### 6. Inicialização do Servidor
+
+```bash
+# Execução em ambiente de desenvolvimento
 npm run start:dev
+
 ```
 
-O servidor estará disponível em: **http://localhost:3000**
+A API estará disponível para receber requisições no endereço: `http://localhost:3001`
 
-## API Endpoints
+## Documentação da API (Swagger)
 
-### Produtos
+A especificação técnica e documentação interativa de todos os *endpoints* está disponível através do Swagger UI. Com o servidor em execução, acesse o seguinte endereço no navegador:
 
-| Método | Endpoint | Descrição |
-| --- | --- | --- |
-| GET | `/products` | Listar produtos do tenant |
-| POST | `/products` | Criar novo produto |
-| GET | `/products/:id` | Obter detalhes de um produto |
-| PATCH | `/products/:id` | Atualizar um produto |
-| DELETE | `/products/:id` | Deletar um produto |
+**http://localhost:3001/api**
 
-### Solicitações de Contato
+A interface provê os esquemas de requisição (payloads), modelos de resposta e permite a realização de chamadas de teste, incluindo o gerenciamento do Bearer Token e do header `X-Tenant-ID`.
 
-| Método | Endpoint | Descrição |
-| --- | --- | --- |
-| GET | `/contact-requests` | Listar solicitações do tenant |
-| POST | `/contact-requests` | Criar nova solicitação |
-| GET | `/contact-requests/:id` | Obter detalhes de uma solicitação |
-| PATCH | `/contact-requests/:id` | Atualizar status de uma solicitação |
-| DELETE | `/contact-requests/:id` | Deletar uma solicitação |
+## Estrutura de Diretórios (Clean Architecture Adaptada)
 
-## Headers Obrigatórios
+```text
+src/
+ ├── auth/              # Lógica de autenticação, registro, guards e estratégias JWT
+ ├── category/          # Módulo de gestão de categorias de produtos
+ ├── contact-request/   # Gestão de formulários de contato e leads
+ ├── database/          # Configurações de conexão do Prisma ORM e arquivos de Seed
+ ├── product/           # Módulo para gerenciamento de produtos e controle de estoque
+ ├── shared/            # Decorators customizados (@TenantId, @Roles) e Exceções/Filtros globais
+ ├── tenant/            # Interceptors e lógica principal de isolamento do contexto multi-tenant
+ ├── tenant-admin/      # Operações de CRUD e configuração dos tenants (lojas)
+ └── upload/            # Serviço de integração para upload e armazenamento de arquivos
 
-Todas as requisições devem incluir o header `X-Tenant-ID`:
-
-```bash
-curl -H "X-Tenant-ID: seu-uuid-do-tenant" http://localhost:3000/products
 ```
-
-## Exemplos de Requisições
-
-### Criar um Produto
-
-```bash
-curl -X POST http://localhost:3000/products \
-  -H "X-Tenant-ID: 550e8400-e29b-41d4-a716-446655440000" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Anel de Ouro 18k",
-    "description": "Anel clássico com diamante",
-    "price": 1500.00,
-    "images": ["https://cdn.example.com/anel-1.webp"],
-    "specifications": {
-      "material": "ouro-18k",
-      "weight": 5.2
-    }
-  }'
-```
-
-### Criar uma Solicitação de Contato
-
-```bash
-curl -X POST http://localhost:3000/contact-requests \
-  -H "X-Tenant-ID: 550e8400-e29b-41d4-a716-446655440000" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "productId": "uuid-do-produto",
-    "customerName": "João Silva",
-    "customerEmail": "joao@email.com",
-    "customerPhone": "11999999999",
-    "message": "Gostaria de saber mais sobre este anel"
-  }'
-```
-
-## Testes
-
-```bash
-# Testes unitários
-npm run test
-
-# Testes de integração
-npm run test:e2e
-
-# Cobertura de testes
-npm run test:cov
-```
-
-## Comandos Úteis
-
-```bash
-# Desenvolvimento
-npm run start:dev          # Inicia com hot-reload
-npm run build              # Compila TypeScript
-npm run start:prod         # Inicia em produção
-
-# Prisma
-npx prisma migrate dev     # Criar nova migration
-npx prisma migrate deploy  # Aplicar migrations em produção
-npx prisma studio          # UI visual para explorar banco de dados
-
-# Linting
-npm run lint               # Executar ESLint
-npm run format             # Formatar código com Prettier
- 
-# Docker
-docker-compose up -d       # Iniciar todos os serviços
-docker-compose down        # Parar todos os serviços
-docker-compose logs -f     # Ver logs em tempo real
-```
-
-## Segurança Multi-tenant
-
-O sistema implementa múltiplas camadas de isolamento:
-
-1. **Interceptor**: Valida o header `X-Tenant-ID` em toda requisição
-2. **Middleware do Prisma**: Adiciona automaticamente `WHERE tenantId = 'xxx'` em queries
-3. **Índices no Banco**: Otimizam queries filtradas por tenant
-4. **Validação de Autorização**: Endpoints protegidos validam JWT token
-
-## Documentação Completa
-
-Para documentação detalhada, consulte o arquivo `MVP_NEXYSTEN_DOCUMENTACAO_COMPLETA.md` na raiz do projeto.
-
-## Roadmap
-
-### Fase 1: MVP Base 
-- [x] Estrutura de pastas
-- [x] Modelo de dados
-- [x] TenantInterceptor
-- [x] ProductModule
-- [x] ContactRequestModule
-- [ ] Testes automatizados
-
-### Fase 2: Frontend
-- [ ] Aplicação Next.js
-- [ ] Página de vitrine
-- [ ] Formulário de contato
-- [ ] Dashboard admin
-
-### Fase 3: Melhorias
-- [ ] Paginação e filtros
-- [ ] Busca de produtos
-- [ ] Notificações por email
-- [ ] Upload de imagens
-
-### Fase 4: Monetização
-- [ ] Sistema de planos
-- [ ] Processamento de pagamentos
-- [ ] Cobrança mensal
-
-### Fase 5: Infraestrutura
-- [ ] Migração para AWS
-- [ ] CI/CD com GitHub Actions
-- [ ] Monitoramento e alertas
-
-## Contribuindo
-
-Para contribuir com o projeto, siga estas etapas:
-
-1. Faça um fork do repositório
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
-## Suporte
-
-Para dúvidas ou problemas, abra uma issue no repositório ou entre em contato:
-
-**Email**: luiscordeiro2006@gmail.com  
-**Repositório**: https://github.com/DevCordeirocf/Nexysten
-
-## Licença
-
-Este projeto está sob a licença UNLICENSED. Veja o arquivo LICENSE para mais detalhes.
 
 ---
-
-**Última atualização**: Fevereiro 2026  
-**Versão**: 1.0.0  
-**Desenvolvedor**: Luis Eduardo Cordeiro
