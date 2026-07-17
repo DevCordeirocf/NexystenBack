@@ -35,8 +35,8 @@ export class SeedService implements OnModuleInit {
     ];
 
     for (const master of masters) {
-      const exists = await this.prisma.user.findUnique({
-        where: { email: master.email },
+      const exists = await this.prisma.user.findFirst({
+        where: { email: master.email, tenantId: null, role: UserRole.MASTER_ADMIN },
       });
 
       if (!exists) {

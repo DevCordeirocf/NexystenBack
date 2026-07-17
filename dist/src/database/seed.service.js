@@ -77,8 +77,8 @@ let SeedService = SeedService_1 = class SeedService {
             },
         ];
         for (const master of masters) {
-            const exists = await this.prisma.user.findUnique({
-                where: { email: master.email },
+            const exists = await this.prisma.user.findFirst({
+                where: { email: master.email, tenantId: null, role: client_1.UserRole.MASTER_ADMIN },
             });
             if (!exists) {
                 const hashedPassword = await bcrypt.hash(master.password, 10);

@@ -14,7 +14,7 @@ enum UserRole {
 
 model User {
   id        String   @id @default(uuid())
-  email     String   @unique
+  email     String
   password  String
   name      String?
   phone     String?
@@ -26,6 +26,7 @@ model User {
   tenant          TenantStore?     @relation(name: "TenantUsers", fields: [tenantId], references: [id])
   contactRequests ContactRequest[] @relation(name: "UserContactRequests")
 
+  @@unique([tenantId, email])
   @@map("users")
 }
 

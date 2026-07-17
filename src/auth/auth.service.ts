@@ -24,7 +24,9 @@ export class AuthService {
 
     const { email, password, name } = registerMasterDto;
 
-    const existingUser = await this.prisma.user.findUnique({ where: { email } });
+    const existingUser = await this.prisma.user.findFirst({
+      where: { email, tenantId: null, role: UserRole.MASTER_ADMIN },
+    });
     if (existingUser) {
       throw new BadRequestException('Já existe um usuário cadastrado com este e-mail.');
     }
@@ -53,7 +55,9 @@ export class AuthService {
 
     const { email, password, name, tenantId } = registerTenantAdminDto;
 
-    const existingUser = await this.prisma.user.findUnique({ where: { email } });
+    const existingUser = await this.prisma.user.findFirst({
+      where: { email, tenantId },
+    });
     if (existingUser) {
       throw new BadRequestException('Já existe um usuário cadastrado com este e-mail.');
     }
@@ -122,10 +126,14 @@ export class AuthService {
   /**
    * Realiza a autenticação do usuário e gera o token JWT
    */
-  async login(loginUserDto: LoginUserDto) {
+  async login(loginUserDto: LoginUserDto, tenantId?: string) {
     const { email, password } = loginUserDto;
 
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const user = tenantId
+      ? await this.prisma.user.findFirst({ where: { email, tenantId } })
+      : await this.prisma.user.findFirst({
+          where: { email, tenantId: null, role: UserRole.MASTER_ADMIN },
+        });
     if (!user) {
       throw new UnauthorizedException('E-mail ou senha inválidos.');
     }

@@ -69,7 +69,9 @@ let TenantAdminService = class TenantAdminService {
                 },
             });
             if (adminEmail && adminPassword) {
-                const existingAdminUser = await prisma.user.findUnique({ where: { email: adminEmail } });
+                const existingAdminUser = await prisma.user.findFirst({
+                    where: { email: adminEmail, tenantId: tenant.id },
+                });
                 if (existingAdminUser) {
                     throw new common_1.BadRequestException(`Já existe um usuário cadastrado com o e-mail '${adminEmail}'.`);
                 }

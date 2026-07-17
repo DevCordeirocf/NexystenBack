@@ -60,7 +60,9 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Apenas um MASTER_ADMIN pode criar outros administradores master.');
         }
         const { email, password, name } = registerMasterDto;
-        const existingUser = await this.prisma.user.findUnique({ where: { email } });
+        const existingUser = await this.prisma.user.findFirst({
+            where: { email, tenantId: null, role: client_1.UserRole.MASTER_ADMIN },
+        });
         if (existingUser) {
             throw new common_1.BadRequestException('Já existe um usuário cadastrado com este e-mail.');
         }
@@ -80,7 +82,9 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Apenas um MASTER_ADMIN pode criar administradores de loja.');
         }
         const { email, password, name, tenantId } = registerTenantAdminDto;
-        const existingUser = await this.prisma.user.findUnique({ where: { email } });
+        const existingUser = await this.prisma.user.findFirst({
+            where: { email, tenantId },
+        });
         if (existingUser) {
             throw new common_1.BadRequestException('Já existe um usuário cadastrado com este e-mail.');
         }
@@ -130,9 +134,13 @@ let AuthService = class AuthService {
         });
         return { message: 'Cliente registrado com sucesso', userId: user.id };
     }
-    async login(loginUserDto) {
+    async login(loginUserDto, tenantId) {
         const { email, password } = loginUserDto;
-        const user = await this.prisma.user.findUnique({ where: { email } });
+        const user = tenantId
+            ? await this.prisma.user.findFirst({ where: { email, tenantId } })
+            : await this.prisma.user.findFirst({
+                where: { email, tenantId: null, role: client_1.UserRole.MASTER_ADMIN },
+            });
         if (!user) {
             throw new common_1.UnauthorizedException('E-mail ou senha inválidos.');
         }

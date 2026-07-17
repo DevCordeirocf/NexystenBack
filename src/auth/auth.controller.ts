@@ -53,8 +53,12 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: 'Realizar login e obter token JWT' })
+  @ApiHeader({ name: 'X-Tenant-ID', description: 'ID ou nome do tenant para login de usuarios de loja. MASTER_ADMIN pode logar sem tenant.', required: false })
   @HttpCode(HttpStatus.OK)
-  login(@Body() loginUserDto: LoginUserDto) {
-    return this.authService.login(loginUserDto);
+  login(
+    @Body() loginUserDto: LoginUserDto,
+    @TenantId() tenantId?: string,
+  ) {
+    return this.authService.login(loginUserDto, tenantId);
   }
 }

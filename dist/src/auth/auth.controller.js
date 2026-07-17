@@ -38,8 +38,8 @@ let AuthController = class AuthController {
     registerCustomer(registerCustomerDto, tenantId) {
         return this.authService.registerCustomer(registerCustomerDto, tenantId);
     }
-    login(loginUserDto) {
-        return this.authService.login(loginUserDto);
+    login(loginUserDto, tenantId) {
+        return this.authService.login(loginUserDto, tenantId);
     }
 };
 exports.AuthController = AuthController;
@@ -82,10 +82,12 @@ __decorate([
 __decorate([
     (0, common_1.Post)('login'),
     (0, swagger_1.ApiOperation)({ summary: 'Realizar login e obter token JWT' }),
+    (0, swagger_1.ApiHeader)({ name: 'X-Tenant-ID', description: 'ID ou nome do tenant para login de usuarios de loja. MASTER_ADMIN pode logar sem tenant.', required: false }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, tenant_id_decorator_1.TenantId)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [login_user_dto_1.LoginUserDto]),
+    __metadata("design:paramtypes", [login_user_dto_1.LoginUserDto, String]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "login", null);
 exports.AuthController = AuthController = __decorate([

@@ -34,7 +34,9 @@ export class TenantAdminService {
 
       // Criação opcional do usuário administrador da loja
       if (adminEmail && adminPassword) {
-        const existingAdminUser = await prisma.user.findUnique({ where: { email: adminEmail } });
+        const existingAdminUser = await prisma.user.findFirst({
+          where: { email: adminEmail, tenantId: tenant.id },
+        });
         if (existingAdminUser) {
           throw new BadRequestException(`Já existe um usuário cadastrado com o e-mail '${adminEmail}'.`);
         }

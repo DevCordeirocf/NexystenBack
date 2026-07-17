@@ -16,7 +16,7 @@ export declare class AuthService {
         message: string;
         userId: string;
     }>;
-    login(loginUserDto: LoginUserDto): Promise<{
+    login(loginUserDto: LoginUserDto, tenantId?: string): Promise<{
         access_token: string;
     }>;
     validateUser(payload: any): Promise<{
