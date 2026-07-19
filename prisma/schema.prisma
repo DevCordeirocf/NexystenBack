@@ -19,7 +19,7 @@ model User {
   name      String?
   phone     String?
   role      UserRole @default(CUSTOMER)
-  tenantId  String?  // Para TENANT_ADMIN e CUSTOMER, vincula ao TenantStore
+  tenantId  String? // Para TENANT_ADMIN e CUSTOMER, vincula ao TenantStore
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -36,9 +36,9 @@ model TenantStore {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  themeConfig Json?    // Configurações de tema em formato JSON
-  logoUrl     String?  // URL da logo da loja
-  whatsapp    String?  // Número de WhatsApp para contato
+  themeConfig Json? // Configurações de tema em formato JSON
+  logoUrl     String? // URL da logo da loja
+  whatsapp    String? // Número de WhatsApp para contato
 
   products        Product[]
   categories      Category[]
@@ -70,10 +70,10 @@ model Product {
   name           String
   description    String
   price          Decimal  @db.Decimal(10, 2)
-  stock          Int      @default(1) // Quantidade em estoque (1 para itens únicos como imóveis)
-  isActive       Boolean  @default(true) // Se o produto está ativo na vitrine
-  images         String[] // URLs das imagens
-  specifications Json?    // JSON flexível para especificações
+  stock          Int      @default(1)
+  isActive       Boolean  @default(true)
+  images         String[]
+  specifications Json?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -82,7 +82,8 @@ model Product {
   contactRequests ContactRequest[]
 
   @@unique([tenantId, name])
-  @@index([tenantId])
+  @@index([tenantId, isActive])
+  @@index([tenantId, createdAt])
   @@map("products")
 }
 
@@ -90,7 +91,7 @@ model ContactRequest {
   id            String   @id @default(uuid())
   tenantId      String
   productId     String
-  userId        String?  // Opcional: vincula ao usuário logado (CUSTOMER)
+  userId        String? // Opcional: vincula ao usuário logado (CUSTOMER)
   customerName  String
   customerEmail String
   customerPhone String?
@@ -102,7 +103,7 @@ model ContactRequest {
   product Product     @relation(fields: [productId], references: [id])
   user    User?       @relation(name: "UserContactRequests", fields: [userId], references: [id])
 
-  @@index([tenantId])
+  @@index([tenantId, createdAt(sort: Desc)])
   @@index([productId])
   @@index([userId])
   @@map("contact_requests")
