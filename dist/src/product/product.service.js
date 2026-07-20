@@ -41,28 +41,33 @@ let ProductService = class ProductService {
             });
         }
         catch (error) {
-            throw error;
+            this.handlePrismaError(error, 'Erro ao criar o produto.');
         }
     }
     async findAll(categoryId, userRole) {
-        const tenantId = this.tenantContextService.getRequiredTenantId();
-        const where = {
-            tenantId,
-            categories: categoryId ? {
-                some: { id: categoryId }
-            } : undefined,
-        };
-        if (!userRole || userRole === client_1.UserRole.CUSTOMER) {
-            where.isActive = true;
-            where.stock = { gt: 0 };
+        try {
+            const tenantId = this.tenantContextService.getRequiredTenantId();
+            const where = {
+                tenantId,
+                categories: categoryId ? {
+                    some: { id: categoryId }
+                } : undefined,
+            };
+            if (!userRole || userRole === client_1.UserRole.CUSTOMER) {
+                where.isActive = true;
+                where.stock = { gt: 0 };
+            }
+            return await this.prisma.product.findMany({
+                where,
+                include: {
+                    categories: true
+                },
+                orderBy: { createdAt: 'desc' },
+            });
         }
-        return this.prisma.product.findMany({
-            where,
-            include: {
-                categories: true
-            },
-            orderBy: { createdAt: 'desc' },
-        });
+        catch (error) {
+            this.handlePrismaError(error, 'Erro ao listar os produtos.');
+        }
     }
     async findOne(id) {
         const tenantId = this.tenantContextService.getRequiredTenantId();
@@ -76,51 +81,85 @@ let ProductService = class ProductService {
             }
         });
         if (!product) {
-            throw new common_1.NotFoundException(`Produto com ID "${id}" não encontrado para este tenant.`);
+            throw new common_1.NotFoundException(`Produto com ID "${id}" não encontrado.`);
         }
         return product;
     }
     async update(id, updateProductDto) {
-        const tenantId = this.tenantContextService.getRequiredTenantId();
-        const { categoryIds, ...productData } = updateProductDto;
-        await this.findOne(id);
-        return this.prisma.product.update({
-            where: { id, tenantId },
-            data: {
-                ...productData,
-                categories: categoryIds ? {
-                    set: categoryIds.map(id => ({ id }))
-                } : undefined,
-            },
-            include: {
-                categories: true
-            }
-        });
+        try {
+            const tenantId = this.tenantContextService.getRequiredTenantId();
+            const { categoryIds, ...productData } = updateProductDto;
+            await this.findOne(id);
+            return await this.prisma.product.update({
+                where: { id, tenantId },
+                data: {
+                    ...productData,
+                    categories: categoryIds ? {
+                        set: categoryIds.map(id => ({ id }))
+                    } : undefined,
+                },
+                include: {
+                    categories: true
+                }
+            });
+        }
+        catch (error) {
+            this.handlePrismaError(error, 'Erro ao atualizar o produto.');
+        }
     }
     async remove(id) {
         const tenantId = this.tenantContextService.getRequiredTenantId();
         await this.findOne(id);
-        return this.prisma.product.delete({
-            where: { id, tenantId },
-        });
+        try {
+            return await this.prisma.product.delete({
+                where: { id, tenantId },
+            });
+        }
+        catch (error) {
+            if (error.code === 'P2003') {
+                throw new common_1.ConflictException('Não é possível excluir este produto pois existem solicitações de contato (leads) ou histórico vinculados a ele. Recomendamos inativar o produto.');
+            }
+            this.handlePrismaError(error, 'Erro ao excluir o produto.');
+        }
     }
     async updateStockAndAvailability(id, stock, isActive) {
-        const tenantId = this.tenantContextService.getRequiredTenantId();
-        await this.findOne(id);
-        const dataToUpdate = {};
-        if (stock !== undefined) {
-            dataToUpdate.stock = stock;
-        }
-        if (isActive !== undefined) {
-            dataToUpdate.isActive = isActive;
-        }
-        return this.prisma.product.update({
-            where: { id, tenantId },
-            data: dataToUpdate,
-            include: {
-                categories: true
+        try {
+            const tenantId = this.tenantContextService.getRequiredTenantId();
+            await this.findOne(id);
+            const dataToUpdate = {};
+            if (stock !== undefined) {
+                dataToUpdate.stock = stock;
             }
-        });
+            if (isActive !== undefined) {
+                dataToUpdate.isActive = isActive;
+            }
+            return await this.prisma.product.update({
+                where: { id, tenantId },
+                data: dataToUpdate,
+                include: {
+                    categories: true
+                }
+            });
+        }
+        catch (error) {
+            this.handlePrismaError(error, 'Erro ao atualizar a disponibilidade do produto.');
+        }
+    }
+    handlePrismaError(error, defaultMessage) {
+        if (error.status) {
+            throw error;
+        }
+        switch (error.code) {
+            case 'P2002':
+                throw new common_1.ConflictException('Já existe um registro com estes dados únicos neste tenant.');
+            case 'P2025':
+                throw new common_1.NotFoundException('Registro não encontrado na base de dados.');
+            case 'P2014':
+                throw new common_1.BadRequestException('A alteração solicitada viola uma relação exigida pelo banco de dados.');
+            default:
+                console.error(`[ProductService Error]: ${error.message || error}`);
+                throw new common_1.InternalServerErrorException(defaultMessage);
+        }
     }
 };
 exports.ProductService = ProductService;

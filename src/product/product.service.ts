@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { 
+  Injectable, 
+  NotFoundException, 
+  ConflictException, 
+  InternalServerErrorException, 
+  BadRequestException 
+} from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { TenantContextService } from '../tenant/tenant-context.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -35,9 +41,8 @@ export class ProductService {
           categories: true
         }
       });
-    } catch (error) {
-      // Re-lança o erro para ser tratado pelo Global Exception Filter
-      throw error;
+    } catch (error: any) {
+      this.handlePrismaError(error, 'Erro ao criar o produto.');
     }
   }
 
@@ -47,28 +52,32 @@ export class ProductService {
    * filtra apenas produtos ativos e com estoque.
    */
   async findAll(categoryId?: string, userRole?: UserRole) {
-    const tenantId = this.tenantContextService.getRequiredTenantId();
+    try {
+      const tenantId = this.tenantContextService.getRequiredTenantId();
 
-    const where: any = {
-      tenantId,
-      categories: categoryId ? {
-        some: { id: categoryId }
-      } : undefined,
-    };
+      const where: any = {
+        tenantId,
+        categories: categoryId ? {
+          some: { id: categoryId }
+        } : undefined,
+      };
 
-    // Se for cliente ou acesso público (sem role), aplica filtros de disponibilidade
-    if (!userRole || userRole === UserRole.CUSTOMER) {
-      where.isActive = true;
-      where.stock = { gt: 0 };
+      // Se for cliente ou acesso público (sem role), aplica filtros de disponibilidade
+      if (!userRole || userRole === UserRole.CUSTOMER) {
+        where.isActive = true;
+        where.stock = { gt: 0 };
+      }
+
+      return await this.prisma.product.findMany({
+        where,
+        include: {
+          categories: true
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (error: any) {
+      this.handlePrismaError(error, 'Erro ao listar os produtos.');
     }
-
-    return this.prisma.product.findMany({
-      where,
-      include: {
-        categories: true
-      },
-      orderBy: { createdAt: 'desc' },
-    });
   }
 
   /**
@@ -88,7 +97,7 @@ export class ProductService {
     });
 
     if (!product) {
-      throw new NotFoundException(`Produto com ID "${id}" não encontrado para este tenant.`);
+      throw new NotFoundException(`Produto com ID "${id}" não encontrado.`);
     }
 
     return product;
@@ -99,24 +108,28 @@ export class ProductService {
    * Permite atualizar as categorias vinculadas.
    */
   async update(id: string, updateProductDto: UpdateProductDto) {
-    const tenantId = this.tenantContextService.getRequiredTenantId();
-    const { categoryIds, ...productData } = updateProductDto;
+    try {
+      const tenantId = this.tenantContextService.getRequiredTenantId();
+      const { categoryIds, ...productData } = updateProductDto;
 
-    // Verifica se o produto existe e pertence ao tenant antes de atualizar
-    await this.findOne(id);
+      // Verifica se o produto existe e pertence ao tenant antes de atualizar
+      await this.findOne(id);
 
-    return this.prisma.product.update({
-      where: { id, tenantId },
-      data: {
-        ...productData,
-        categories: categoryIds ? {
-          set: categoryIds.map(id => ({ id }))
-        } : undefined,
-      },
-      include: {
-        categories: true
-      }
-    });
+      return await this.prisma.product.update({
+        where: { id, tenantId },
+        data: {
+          ...productData,
+          categories: categoryIds ? {
+            set: categoryIds.map(id => ({ id }))
+          } : undefined,
+        },
+        include: {
+          categories: true
+        }
+      });
+    } catch (error: any) {
+      this.handlePrismaError(error, 'Erro ao atualizar o produto.');
+    }
   }
 
   /**
@@ -124,38 +137,68 @@ export class ProductService {
    */
   async remove(id: string) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
-
-    // Verifica se o produto existe e pertence ao tenant antes de remover
     await this.findOne(id);
 
-    return this.prisma.product.delete({
-      where: { id, tenantId },
-    });
+    try {
+      return await this.prisma.product.delete({
+        where: { id, tenantId },
+      });
+    } catch (error: any) {
+      if (error.code === 'P2003') {
+        throw new ConflictException(
+          'Não é possível excluir este produto pois existem solicitações de contato (leads) ou histórico vinculados a ele. Recomendamos inativar o produto.'
+        );
+      }
+      this.handlePrismaError(error, 'Erro ao excluir o produto.');
+    }
   }
 
   /**
    * Atualiza o estoque e a disponibilidade de um produto existente do tenant atual.
    */
   async updateStockAndAvailability(id: string, stock?: number, isActive?: boolean) {
-    const tenantId = this.tenantContextService.getRequiredTenantId();
+    try {
+      const tenantId = this.tenantContextService.getRequiredTenantId();
+      await this.findOne(id);
 
-    // Verifica se o produto existe e pertence ao tenant antes de atualizar
-    await this.findOne(id);
-
-    const dataToUpdate: { stock?: number; isActive?: boolean } = {};
-    if (stock !== undefined) {
-      dataToUpdate.stock = stock;
-    }
-    if (isActive !== undefined) {
-      dataToUpdate.isActive = isActive;
-    }
-
-    return this.prisma.product.update({
-      where: { id, tenantId },
-      data: dataToUpdate,
-      include: {
-        categories: true
+      const dataToUpdate: { stock?: number; isActive?: boolean } = {};
+      if (stock !== undefined) {
+        dataToUpdate.stock = stock;
       }
-    });
+      if (isActive !== undefined) {
+        dataToUpdate.isActive = isActive;
+      }
+
+      return await this.prisma.product.update({
+        where: { id, tenantId },
+        data: dataToUpdate,
+        include: {
+          categories: true
+        }
+      });
+    } catch (error: any) {
+      this.handlePrismaError(error, 'Erro ao atualizar a disponibilidade do produto.');
+    }
+  }
+
+  /**
+   * Método privado para centralizar o tratamento de erros nativos do Prisma.
+   */
+  private handlePrismaError(error: any, defaultMessage: string): never {
+    if (error.status) {
+      throw error;
+    }
+
+    switch (error.code) {
+      case 'P2002':
+        throw new ConflictException('Já existe um registro com estes dados únicos neste tenant.');
+      case 'P2025':
+        throw new NotFoundException('Registro não encontrado na base de dados.');
+      case 'P2014':
+        throw new BadRequestException('A alteração solicitada viola uma relação exigida pelo banco de dados.');
+      default:
+        console.error(`[ProductService Error]: ${error.message || error}`);
+        throw new InternalServerErrorException(defaultMessage);
+    }
   }
 }

@@ -48,19 +48,21 @@ export class TenantDevController {
     const tenant = await this.prisma.tenantStore.findUnique({ where: { id: tenantId } });
     if (!tenant) throw new NotFoundException('Tenant não encontrado');
 
+    const uniqueSuffix = Date.now().toString().slice(-4);
+
     return this.prisma.$transaction(async (tx) => {
       // 1. Criar Categorias
       const catAneis = await tx.category.create({
-        data: { name: 'Anéis', description: 'Anéis de ouro e prata', tenantId }
+        data: { name: `Anéis ${uniqueSuffix}`, description: 'Anéis de ouro e prata', tenantId }
       });
       const catColares = await tx.category.create({
-        data: { name: 'Colares', description: 'Colares e gargantilhas', tenantId }
+        data: { name: `Colares ${uniqueSuffix}`, description: 'Colares e gargantilhas', tenantId }
       });
 
       // 2. Criar Produtos
       const p1 = await tx.product.create({
         data: {
-          name: 'Anel Solitário Diamante',
+          name: `Anel Solitário Diamante ${uniqueSuffix}`,
           description: 'Anel clássico em ouro 18k com diamante de 15 pontos.',
           price: 2500.00,
           stock: 5,
@@ -72,7 +74,7 @@ export class TenantDevController {
 
       const p2 = await tx.product.create({
         data: {
-          name: 'Colar de Pérolas',
+          name: `Colar de Pérolas ${uniqueSuffix}`,
           description: 'Colar elegante com pérolas naturais e fecho em prata.',
           price: 850.00,
           stock: 10,
@@ -87,8 +89,8 @@ export class TenantDevController {
         data: {
           tenantId,
           productId: p1.id,
-          customerName: 'João Silva (Teste)',
-          customerEmail: 'joao.teste@email.com',
+          customerName: `João Silva (Teste ${uniqueSuffix})`,
+          customerEmail: `joao.teste.${uniqueSuffix}@email.com`,
           customerPhone: '11999999999',
           message: 'Tenho interesse neste anel, qual o prazo de entrega?',
           status: 'PENDING'
@@ -100,7 +102,8 @@ export class TenantDevController {
         data: {
           categories: 2,
           products: 2,
-          leads: 1
+          leads: 1,
+          loteGerado: uniqueSuffix
         }
       };
     });

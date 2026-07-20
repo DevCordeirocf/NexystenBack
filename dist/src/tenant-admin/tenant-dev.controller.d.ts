@@ -16,35 +16,36 @@ export declare class TenantDevController {
             categories: number;
             products: number;
             leads: number;
+            loteGerado: string;
         };
     }>;
     findAllUsers(): Promise<{
         id: string;
         name: string | null;
         createdAt: Date;
+        tenantId: string | null;
         email: string;
         role: import("@prisma/client").$Enums.UserRole;
-        tenantId: string | null;
     }[]>;
     findAllProducts(): Promise<({
-        categories: {
-            name: string;
-        }[];
         tenant: {
             name: string;
         };
+        categories: {
+            name: string;
+        }[];
     } & {
         id: string;
         name: string;
+        description: string;
+        price: import("@prisma/client-runtime-utils").Decimal;
+        stock: number;
         isActive: boolean;
+        images: string[];
+        specifications: import("@prisma/client/runtime/client").JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
         tenantId: string;
-        description: string;
-        price: import("@prisma/client-runtime-utils").Decimal;
-        images: string[];
-        specifications: import("@prisma/client/runtime/client").JsonValue | null;
-        stock: number;
     })[]>;
     findAllCategories(): Promise<({
         tenant: {
@@ -53,16 +54,16 @@ export declare class TenantDevController {
     } & {
         id: string;
         name: string;
+        description: string | null;
         createdAt: Date;
         updatedAt: Date;
         tenantId: string;
-        description: string | null;
     })[]>;
     findAllLeads(): Promise<({
-        product: {
+        tenant: {
             name: string;
         };
-        tenant: {
+        product: {
             name: string;
         };
     } & {
@@ -70,8 +71,8 @@ export declare class TenantDevController {
         createdAt: Date;
         tenantId: string;
         message: string | null;
-        userId: string | null;
         productId: string;
+        userId: string | null;
         customerName: string;
         customerEmail: string;
         customerPhone: string | null;
