@@ -88,7 +88,7 @@ let TenantAdminService = class TenantAdminService {
             return tenant;
         });
     }
-    async findAll() {
+    async findAllTenants() {
         return this.prisma.tenantStore.findMany({
             include: { users: { select: { id: true, email: true } } },
         });
@@ -102,6 +102,23 @@ let TenantAdminService = class TenantAdminService {
             throw new common_1.NotFoundException(`Loja com ID "${id}" não encontrada.`);
         }
         return tenant;
+    }
+    async findAllUsersByTenant(tenantId) {
+        await this.findOne(tenantId);
+        return this.prisma.user.findMany({
+            where: { tenantId },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                phone: true,
+                role: true,
+                tenantId: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+            orderBy: { createdAt: 'desc' },
+        });
     }
     async update(id, updateTenantDto) {
         const { logoUrl, whatsapp, ...dataToUpdate } = updateTenantDto;

@@ -30,11 +30,14 @@ let TenantAdminController = class TenantAdminController {
     create(createTenantDto) {
         return this.tenantAdminService.create(createTenantDto);
     }
-    findAll() {
-        return this.tenantAdminService.findAll();
+    findAllTenants() {
+        return this.tenantAdminService.findAllTenants();
     }
     findOne(id) {
         return this.tenantAdminService.findOne(id);
+    }
+    findAllUsersByTenant(id) {
+        return this.tenantAdminService.findAllUsersByTenant(id);
     }
     update(id, updateTenantDto) {
         return this.tenantAdminService.update(id, updateTenantDto);
@@ -59,7 +62,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], TenantAdminController.prototype, "findAll", null);
+], TenantAdminController.prototype, "findAllTenants", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Obter um tenant específico pelo ID' }),
@@ -68,6 +71,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], TenantAdminController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Get)(':id/users'),
+    (0, swagger_1.ApiOperation)({ summary: 'Listar todos os usuarios de um tenant' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], TenantAdminController.prototype, "findAllUsersByTenant", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Atualizar um tenant existente' }),

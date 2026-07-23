@@ -58,7 +58,7 @@ export class TenantAdminService {
   /**
    * Lista todas as lojas cadastradas no sistema
    */
-  async findAll() {
+  async findAllTenants() {
     return this.prisma.tenantStore.findMany({
       include: { users: { select: { id: true, email: true } } },
     });
@@ -76,6 +76,25 @@ export class TenantAdminService {
       throw new NotFoundException(`Loja com ID "${id}" não encontrada.`);
     }
     return tenant;
+  }
+
+  async findAllUsersByTenant(tenantId: string) {
+    await this.findOne(tenantId);
+
+    return this.prisma.user.findMany({
+      where: { tenantId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        phone: true,
+        role: true,
+        tenantId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   /**

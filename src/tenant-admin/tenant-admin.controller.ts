@@ -25,14 +25,20 @@ export class TenantAdminController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todos os tenants cadastrados' })
-  findAll() {
-    return this.tenantAdminService.findAll();
+  findAllTenants() {
+    return this.tenantAdminService.findAllTenants();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obter um tenant específico pelo ID' })
   findOne(@Param('id') id: string) {
     return this.tenantAdminService.findOne(id);
+  }
+
+  @Get(':id/users')
+  @ApiOperation({ summary: 'Listar todos os usuarios de um tenant' })
+  findAllUsersByTenant(@Param('id') id: string) {
+    return this.tenantAdminService.findAllUsersByTenant(id);
   }
 
   @Patch(':id')
