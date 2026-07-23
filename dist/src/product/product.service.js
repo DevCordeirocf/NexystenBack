@@ -25,6 +25,9 @@ let ProductService = class ProductService {
         try {
             const tenantId = this.tenantContextService.getRequiredTenantId();
             const { categoryIds, stock, isActive, ...productData } = createProductDto;
+            if (categoryIds?.length) {
+                await this.ensureCategoriesBelongToTenant(categoryIds, tenantId);
+            }
             return await this.prisma.product.create({
                 data: {
                     ...productData,
@@ -90,6 +93,9 @@ let ProductService = class ProductService {
             const tenantId = this.tenantContextService.getRequiredTenantId();
             const { categoryIds, ...productData } = updateProductDto;
             await this.findOne(id);
+            if (categoryIds?.length) {
+                await this.ensureCategoriesBelongToTenant(categoryIds, tenantId);
+            }
             return await this.prisma.product.update({
                 where: { id, tenantId },
                 data: {
@@ -159,6 +165,18 @@ let ProductService = class ProductService {
             default:
                 console.error(`[ProductService Error]: ${error.message || error}`);
                 throw new common_1.InternalServerErrorException(defaultMessage);
+        }
+    }
+    async ensureCategoriesBelongToTenant(categoryIds, tenantId) {
+        const uniqueCategoryIds = [...new Set(categoryIds)];
+        const ownedCategoriesCount = await this.prisma.category.count({
+            where: {
+                id: { in: uniqueCategoryIds },
+                tenantId,
+            },
+        });
+        if (ownedCategoriesCount !== uniqueCategoryIds.length) {
+            throw new common_1.BadRequestException('Uma ou mais categorias nao pertencem ao tenant atual.');
         }
     }
 };

@@ -131,4 +131,5 @@ export declare class ProductService {
         stock: number;
     }>;
     private handlePrismaError;
+    private ensureCategoriesBelongToTenant;
 }

@@ -1,101 +1,78 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../database/prisma.service';
+import { TenantContextService } from '../tenant/tenant-context.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
 export class CategoryService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly tenantContextService: TenantContextService,
+  ) {}
 
-  /**
-   * Cria uma nova categoria para um tenant específico.
-   * @param createCategoryDto Dados para criação da categoria.
-   * @returns A categoria criada.
-   */
   async create(createCategoryDto: CreateCategoryDto) {
-    const { tenantId, ...data } = createCategoryDto;
-    console.log(tenantId)
-    if (!tenantId) {
-      throw new BadRequestException("O ID do Tenant é obrigatório para criar uma categoria.");
-    }
+    const tenantId = this.tenantContextService.getRequiredTenantId();
+    const { tenantId: _ignoredTenantId, ...data } = createCategoryDto;
+
     return this.prisma.category.create({
       data: {
         ...data,
-        tenantId: tenantId as string,
+        tenantId,
       },
     });
   }
 
-  /**
-   * Lista todas as categorias de um tenant específico.
-   * @param tenantId ID do tenant.
-   * @returns Uma lista de categorias.
-   */
-  async findAll(tenantId: string) {
+  async findAll() {
+    const tenantId = this.tenantContextService.getRequiredTenantId();
+
     return this.prisma.category.findMany({
-      where: {
-        tenantId: tenantId as string,
-      },
+      where: { tenantId },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
-  /**
-   * Busca uma categoria específica pelo ID e tenantId.
-   * @param id ID da categoria.
-   * @param tenantId ID do tenant.
-   * @returns A categoria encontrada.
-   * @throws NotFoundException Se a categoria não for encontrada para o tenant.
-   */
-  async findOne(id: string, tenantId: string) {
-    const category = await this.prisma.category.findUnique({
+  async findOne(id: string) {
+    const tenantId = this.tenantContextService.getRequiredTenantId();
+
+    const category = await this.prisma.category.findFirst({
       where: {
         id,
-        tenantId: tenantId as string,
+        tenantId,
       },
     });
 
     if (!category) {
-      throw new NotFoundException(`Categoria com ID "${id}" não encontrada para este tenant.`);
+      throw new NotFoundException(`Categoria com ID "${id}" nao encontrada para este tenant.`);
     }
+
     return category;
   }
 
-  /**
-   * Atualiza uma categoria existente para um tenant específico.
-   * @param id ID da categoria a ser atualizada.
-   * @param tenantId ID do tenant.
-   * @param updateCategoryDto Dados para atualização da categoria.
-   * @returns A categoria atualizada.
-   * @throws NotFoundException Se a categoria não for encontrada para o tenant.
-   */
-  async update(id: string, tenantId: string, updateCategoryDto: UpdateCategoryDto) {
-    // Verifica se a categoria existe e pertence ao tenant antes de atualizar
-    await this.findOne(id, tenantId);
+  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+    const tenantId = this.tenantContextService.getRequiredTenantId();
+    const { tenantId: _ignoredTenantId, ...data } = updateCategoryDto;
+
+    await this.findOne(id);
 
     return this.prisma.category.update({
       where: {
         id,
         tenantId,
       },
-      data: updateCategoryDto,
+      data,
     });
   }
 
-  /**
-   * Remove uma categoria de um tenant específico.
-   * @param id ID da categoria a ser removida.
-   * @param tenantId ID do tenant.
-   * @returns A categoria removida.
-   * @throws NotFoundException Se a categoria não for encontrada para o tenant.
-   */
-  async remove(id: string, tenantId: string) {
-    // Verifica se a categoria existe e pertence ao tenant antes de remover
-    await this.findOne(id, tenantId);
+  async remove(id: string) {
+    const tenantId = this.tenantContextService.getRequiredTenantId();
+
+    await this.findOne(id);
 
     return this.prisma.category.delete({
       where: {
         id,
-        tenantId: tenantId as string,
+        tenantId,
       },
     });
   }

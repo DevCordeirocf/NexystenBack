@@ -118,7 +118,7 @@ export class ContactRequestService {
     await this.findOne(id);
 
     return this.prisma.contactRequest.update({
-      where: { id },
+      where: { id, tenantId },
       data: updateContactRequestDto,
       include: {
         product: true,
@@ -136,7 +136,7 @@ export class ContactRequestService {
     await this.findOne(id);
 
     return this.prisma.contactRequest.delete({
-      where: { id },
+      where: { id, tenantId },
     });
   }
 }

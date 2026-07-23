@@ -93,7 +93,7 @@ let ContactRequestService = class ContactRequestService {
         const tenantId = this.tenantContextService.getRequiredTenantId();
         await this.findOne(id);
         return this.prisma.contactRequest.update({
-            where: { id },
+            where: { id, tenantId },
             data: updateContactRequestDto,
             include: {
                 product: true,
@@ -104,7 +104,7 @@ let ContactRequestService = class ContactRequestService {
         const tenantId = this.tenantContextService.getRequiredTenantId();
         await this.findOne(id);
         return this.prisma.contactRequest.delete({
-            where: { id },
+            where: { id, tenantId },
         });
     }
 };

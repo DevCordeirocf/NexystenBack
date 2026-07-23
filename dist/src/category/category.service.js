@@ -11,60 +11,64 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CategoryService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
+const prisma_service_1 = require("../database/prisma.service");
+const tenant_context_service_1 = require("../tenant/tenant-context.service");
 let CategoryService = class CategoryService {
     prisma;
-    constructor(prisma) {
+    tenantContextService;
+    constructor(prisma, tenantContextService) {
         this.prisma = prisma;
+        this.tenantContextService = tenantContextService;
     }
     async create(createCategoryDto) {
-        const { tenantId, ...data } = createCategoryDto;
-        console.log(tenantId);
-        if (!tenantId) {
-            throw new common_1.BadRequestException("O ID do Tenant é obrigatório para criar uma categoria.");
-        }
+        const tenantId = this.tenantContextService.getRequiredTenantId();
+        const { tenantId: _ignoredTenantId, ...data } = createCategoryDto;
         return this.prisma.category.create({
             data: {
                 ...data,
-                tenantId: tenantId,
+                tenantId,
             },
         });
     }
-    async findAll(tenantId) {
+    async findAll() {
+        const tenantId = this.tenantContextService.getRequiredTenantId();
         return this.prisma.category.findMany({
-            where: {
-                tenantId: tenantId,
-            },
+            where: { tenantId },
+            orderBy: { createdAt: 'desc' },
         });
     }
-    async findOne(id, tenantId) {
-        const category = await this.prisma.category.findUnique({
+    async findOne(id) {
+        const tenantId = this.tenantContextService.getRequiredTenantId();
+        const category = await this.prisma.category.findFirst({
             where: {
                 id,
-                tenantId: tenantId,
+                tenantId,
             },
         });
         if (!category) {
-            throw new common_1.NotFoundException(`Categoria com ID "${id}" não encontrada para este tenant.`);
+            throw new common_1.NotFoundException(`Categoria com ID "${id}" nao encontrada para este tenant.`);
         }
         return category;
     }
-    async update(id, tenantId, updateCategoryDto) {
-        await this.findOne(id, tenantId);
+    async update(id, updateCategoryDto) {
+        const tenantId = this.tenantContextService.getRequiredTenantId();
+        const { tenantId: _ignoredTenantId, ...data } = updateCategoryDto;
+        await this.findOne(id);
         return this.prisma.category.update({
             where: {
                 id,
                 tenantId,
             },
-            data: updateCategoryDto,
+            data,
         });
     }
-    async remove(id, tenantId) {
-        await this.findOne(id, tenantId);
+    async remove(id) {
+        const tenantId = this.tenantContextService.getRequiredTenantId();
+        await this.findOne(id);
         return this.prisma.category.delete({
             where: {
                 id,
-                tenantId: tenantId,
+                tenantId,
             },
         });
     }
@@ -72,6 +76,7 @@ let CategoryService = class CategoryService {
 exports.CategoryService = CategoryService;
 exports.CategoryService = CategoryService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        tenant_context_service_1.TenantContextService])
 ], CategoryService);
 //# sourceMappingURL=category.service.js.map

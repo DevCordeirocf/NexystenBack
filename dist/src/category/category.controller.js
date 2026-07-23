@@ -22,28 +22,26 @@ const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const roles_guard_1 = require("../auth/roles.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
 const client_1 = require("@prisma/client");
-const tenant_id_decorator_1 = require("../shared/decorators/tenant-id.decorator");
 const public_decorator_1 = require("../auth/public.decorator");
 let CategoryController = class CategoryController {
     categoryService;
     constructor(categoryService) {
         this.categoryService = categoryService;
     }
-    create(createCategoryDto, tenantId) {
-        createCategoryDto.tenantId = tenantId;
+    create(createCategoryDto) {
         return this.categoryService.create(createCategoryDto);
     }
-    findAll(tenantId) {
-        return this.categoryService.findAll(tenantId);
+    findAll() {
+        return this.categoryService.findAll();
     }
-    findOne(id, tenantId) {
-        return this.categoryService.findOne(id, tenantId);
+    findOne(id) {
+        return this.categoryService.findOne(id);
     }
-    update(id, updateCategoryDto, tenantId) {
-        return this.categoryService.update(id, tenantId, updateCategoryDto);
+    update(id, updateCategoryDto) {
+        return this.categoryService.update(id, updateCategoryDto);
     }
-    remove(id, tenantId) {
-        return this.categoryService.remove(id, tenantId);
+    remove(id) {
+        return this.categoryService.remove(id);
     }
 };
 exports.CategoryController = CategoryController;
@@ -53,18 +51,16 @@ __decorate([
     (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN, client_1.UserRole.TENANT_ADMIN),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, tenant_id_decorator_1.TenantId)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto, String]),
+    __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto]),
     __metadata("design:returntype", void 0)
 ], CategoryController.prototype, "create", null);
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Listar todas as categorias do tenant' }),
-    __param(0, (0, tenant_id_decorator_1.TenantId)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], CategoryController.prototype, "findAll", null);
 __decorate([
@@ -72,9 +68,8 @@ __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Obter uma categoria específica pelo ID' }),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, tenant_id_decorator_1.TenantId)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], CategoryController.prototype, "findOne", null);
 __decorate([
@@ -83,9 +78,8 @@ __decorate([
     (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN, client_1.UserRole.TENANT_ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
-    __param(2, (0, tenant_id_decorator_1.TenantId)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_category_dto_1.UpdateCategoryDto, String]),
+    __metadata("design:paramtypes", [String, update_category_dto_1.UpdateCategoryDto]),
     __metadata("design:returntype", void 0)
 ], CategoryController.prototype, "update", null);
 __decorate([
@@ -94,9 +88,8 @@ __decorate([
     (0, roles_decorator_1.Roles)(client_1.UserRole.MASTER_ADMIN, client_1.UserRole.TENANT_ADMIN),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, tenant_id_decorator_1.TenantId)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], CategoryController.prototype, "remove", null);
 exports.CategoryController = CategoryController = __decorate([

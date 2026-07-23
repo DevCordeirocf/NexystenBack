@@ -18,7 +18,6 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
-import { TenantId } from '../shared/decorators/tenant-id.decorator';
 import { Public } from '../auth/public.decorator';
 
 /**
@@ -44,8 +43,7 @@ export class CategoryController {
   @ApiOperation({ summary: 'Criar uma nova categoria' })
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createCategoryDto: CreateCategoryDto, @TenantId() tenantId: string) {
-    createCategoryDto.tenantId = tenantId;
+  create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
   }
 
@@ -58,8 +56,8 @@ export class CategoryController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'Listar todas as categorias do tenant' })
-  findAll(@TenantId() tenantId: string) {
-    return this.categoryService.findAll(tenantId);
+  findAll() {
+    return this.categoryService.findAll();
   }
 
   /**
@@ -72,8 +70,8 @@ export class CategoryController {
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Obter uma categoria específica pelo ID' })
-  findOne(@Param('id') id: string, @TenantId() tenantId: string) {
-    return this.categoryService.findOne(id, tenantId);
+  findOne(@Param('id') id: string) {
+    return this.categoryService.findOne(id);
   }
 
   /**
@@ -87,8 +85,8 @@ export class CategoryController {
   @Patch(':id')
   @ApiOperation({ summary: 'Atualizar uma categoria existente' })
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto, @TenantId() tenantId: string) {
-    return this.categoryService.update(id, tenantId, updateCategoryDto);
+  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
+    return this.categoryService.update(id, updateCategoryDto);
   }
 
   /**
@@ -102,7 +100,7 @@ export class CategoryController {
   @ApiOperation({ summary: 'Remover uma categoria' })
   @Roles(UserRole.MASTER_ADMIN, UserRole.TENANT_ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string, @TenantId() tenantId: string) {
-    return this.categoryService.remove(id, tenantId);
+  remove(@Param('id') id: string) {
+    return this.categoryService.remove(id);
   }
 }
