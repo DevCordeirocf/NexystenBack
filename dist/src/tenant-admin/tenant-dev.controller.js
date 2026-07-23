@@ -22,7 +22,13 @@ let TenantDevController = class TenantDevController {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    ensureDevelopmentEnvironment() {
+        if (process.env.NODE_ENV === 'production') {
+            throw new common_1.ForbiddenException('Rotas de desenvolvimento desabilitadas em producao.');
+        }
+    }
     async findAllIds() {
+        this.ensureDevelopmentEnvironment();
         return this.prisma.tenantStore.findMany({
             select: {
                 id: true,
@@ -32,6 +38,7 @@ let TenantDevController = class TenantDevController {
         });
     }
     async resetTenant(tenantId) {
+        this.ensureDevelopmentEnvironment();
         const tenant = await this.prisma.tenantStore.findUnique({ where: { id: tenantId } });
         if (!tenant)
             throw new common_1.NotFoundException('Tenant não encontrado');
@@ -43,6 +50,7 @@ let TenantDevController = class TenantDevController {
         return { message: `Dados do tenant ${tenant.name} foram resetados com sucesso.` };
     }
     async seedTenant(tenantId) {
+        this.ensureDevelopmentEnvironment();
         const tenant = await this.prisma.tenantStore.findUnique({ where: { id: tenantId } });
         if (!tenant)
             throw new common_1.NotFoundException('Tenant não encontrado');
@@ -99,6 +107,7 @@ let TenantDevController = class TenantDevController {
         });
     }
     async findAllUsers() {
+        this.ensureDevelopmentEnvironment();
         return this.prisma.user.findMany({
             select: {
                 id: true,
@@ -111,6 +120,7 @@ let TenantDevController = class TenantDevController {
         });
     }
     async findAllProducts() {
+        this.ensureDevelopmentEnvironment();
         return this.prisma.product.findMany({
             include: {
                 tenant: { select: { name: true } },
@@ -119,6 +129,7 @@ let TenantDevController = class TenantDevController {
         });
     }
     async findAllCategories() {
+        this.ensureDevelopmentEnvironment();
         return this.prisma.category.findMany({
             include: {
                 tenant: { select: { name: true } },
@@ -126,6 +137,7 @@ let TenantDevController = class TenantDevController {
         });
     }
     async findAllLeads() {
+        this.ensureDevelopmentEnvironment();
         return this.prisma.contactRequest.findMany({
             include: {
                 tenant: { select: { name: true } },

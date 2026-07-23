@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, HttpCode, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Param, HttpCode, HttpStatus, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { PrismaService } from '../database/prisma.service';
 import { Public } from '../auth/public.decorator';
@@ -13,9 +13,16 @@ import { Public } from '../auth/public.decorator';
 export class TenantDevController {
   constructor(private readonly prisma: PrismaService) {}
 
+  private ensureDevelopmentEnvironment() {
+    if (process.env.NODE_ENV === 'production') {
+      throw new ForbiddenException('Rotas de desenvolvimento desabilitadas em producao.');
+    }
+  }
+
   @Get()
   @ApiOperation({ summary: 'Listar todos os IDs e nomes de tenants (Público)' })
   async findAllIds() {
+    this.ensureDevelopmentEnvironment();
     return this.prisma.tenantStore.findMany({
       select: {
         id: true,
@@ -29,6 +36,7 @@ export class TenantDevController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Limpar todos os dados de um tenant (Produtos, Categorias, Leads)' })
   async resetTenant(@Param('tenantId') tenantId: string) {
+    this.ensureDevelopmentEnvironment();
     const tenant = await this.prisma.tenantStore.findUnique({ where: { id: tenantId } });
     if (!tenant) throw new NotFoundException('Tenant não encontrado');
 
@@ -45,6 +53,7 @@ export class TenantDevController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Popular tenant com dados de teste (Joias)' })
   async seedTenant(@Param('tenantId') tenantId: string) {
+    this.ensureDevelopmentEnvironment();
     const tenant = await this.prisma.tenantStore.findUnique({ where: { id: tenantId } });
     if (!tenant) throw new NotFoundException('Tenant não encontrado');
 
@@ -112,6 +121,7 @@ export class TenantDevController {
   @Get('all-users')
   @ApiOperation({ summary: 'Listar todos os usuários do sistema (Debug)' })
   async findAllUsers() {
+    this.ensureDevelopmentEnvironment();
     return this.prisma.user.findMany({
       select: {
         id: true,
@@ -127,6 +137,7 @@ export class TenantDevController {
   @Get('all-products')
   @ApiOperation({ summary: 'Listar todos os produtos de todos os tenants (Debug)' })
   async findAllProducts() {
+    this.ensureDevelopmentEnvironment();
     return this.prisma.product.findMany({
       include: {
         tenant: { select: { name: true } },
@@ -138,6 +149,7 @@ export class TenantDevController {
   @Get('all-categories')
   @ApiOperation({ summary: 'Listar todas as categorias de todos os tenants (Debug)' })
   async findAllCategories() {
+    this.ensureDevelopmentEnvironment();
     return this.prisma.category.findMany({
       include: {
         tenant: { select: { name: true } },
@@ -148,6 +160,7 @@ export class TenantDevController {
   @Get('all-leads')
   @ApiOperation({ summary: 'Listar todas as solicitações de contato de todos os tenants (Debug)' })
   async findAllLeads() {
+    this.ensureDevelopmentEnvironment();
     return this.prisma.contactRequest.findMany({
       include: {
         tenant: { select: { name: true } },

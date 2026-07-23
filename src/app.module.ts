@@ -1,5 +1,5 @@
 // src/app.module.ts
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { TenantAdminModule } from './tenant-admin/tenant-admin.module';
 import { CategoryModule } from './category/category.module';
 import { UploadModule } from './upload/upload.module'; 
+import { RateLimitMiddleware } from './shared/middleware/rate-limit.middleware';
 
 @Module({
   imports: [
@@ -33,4 +34,8 @@ import { UploadModule } from './upload/upload.module';
     },
   ], 
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RateLimitMiddleware).forRoutes('*');
+  }
+}

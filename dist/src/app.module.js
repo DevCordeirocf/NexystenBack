@@ -20,7 +20,11 @@ const auth_module_1 = require("./auth/auth.module");
 const tenant_admin_module_1 = require("./tenant-admin/tenant-admin.module");
 const category_module_1 = require("./category/category.module");
 const upload_module_1 = require("./upload/upload.module");
+const rate_limit_middleware_1 = require("./shared/middleware/rate-limit.middleware");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer.apply(rate_limit_middleware_1.RateLimitMiddleware).forRoutes('*');
+    }
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([

@@ -6,11 +6,30 @@ import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
+function getAllowedOrigins() {
+  const configuredOrigins = process.env.CORS_ORIGINS?.split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  if (configuredOrigins?.length) {
+    return configuredOrigins;
+  }
+
+  return process.env.NODE_ENV === 'production'
+    ? []
+    : ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174'];
+}
+
+function shouldEnableSwagger() {
+  return process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true';
+}
+
 /**
  * Função de inicialização da aplicação Nexysten
  */
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.set('trust proxy', 1);
 
   // Configuração para servir arquivos estáticos (uploads de imagens)
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
@@ -18,8 +37,17 @@ async function bootstrap() {
   });
 
   // Configuração de CORS para permitir integração com o Front-end
+  const allowedOrigins = getAllowedOrigins();
+
   app.enableCors({
-    origin: '*',
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error('Origem nao permitida pelo CORS'));
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
@@ -36,6 +64,7 @@ async function bootstrap() {
   // Registro do filtro global de tratamento de erros
   app.useGlobalFilters(new HttpExceptionFilter());
 
+  if (shouldEnableSwagger()) {
   // Configuração do Swagger (OpenAPI)
   const config = new DocumentBuilder()
     .setTitle('Nexysten API')
@@ -64,6 +93,7 @@ async function bootstrap() {
   
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+  }
 
   const port = process.env.PORT || 3001;
   await app.listen(port);
