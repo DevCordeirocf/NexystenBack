@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { TenantContextService } from '../tenant/tenant-context.service';
 import { CreateContactRequestDto } from './dto/create-contact-request.dto';
@@ -29,6 +29,10 @@ export class ContactRequestService {
       throw new NotFoundException(
         `Produto com ID "${createContactRequestDto.productId}" não encontrado para este tenant.`,
       );
+    }
+
+    if (createContactRequestDto.userId) {
+      await this.ensureUserBelongsToTenant(createContactRequestDto.userId, tenantId);
     }
 
     return this.prisma.contactRequest.create({
@@ -138,5 +142,19 @@ export class ContactRequestService {
     return this.prisma.contactRequest.delete({
       where: { id, tenantId },
     });
+  }
+
+  private async ensureUserBelongsToTenant(userId: string, tenantId: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+        tenantId,
+      },
+      select: { id: true },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Usuario informado nao pertence ao tenant atual.');
+    }
   }
 }

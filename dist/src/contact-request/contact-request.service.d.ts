@@ -112,4 +112,5 @@ export declare class ContactRequestService {
         customerPhone: string | null;
         status: string;
     }>;
+    private ensureUserBelongsToTenant;
 }

@@ -31,6 +31,9 @@ let ContactRequestService = class ContactRequestService {
         if (!product) {
             throw new common_1.NotFoundException(`Produto com ID "${createContactRequestDto.productId}" não encontrado para este tenant.`);
         }
+        if (createContactRequestDto.userId) {
+            await this.ensureUserBelongsToTenant(createContactRequestDto.userId, tenantId);
+        }
         return this.prisma.contactRequest.create({
             data: {
                 ...createContactRequestDto,
@@ -106,6 +109,18 @@ let ContactRequestService = class ContactRequestService {
         return this.prisma.contactRequest.delete({
             where: { id, tenantId },
         });
+    }
+    async ensureUserBelongsToTenant(userId, tenantId) {
+        const user = await this.prisma.user.findFirst({
+            where: {
+                id: userId,
+                tenantId,
+            },
+            select: { id: true },
+        });
+        if (!user) {
+            throw new common_1.BadRequestException('Usuario informado nao pertence ao tenant atual.');
+        }
     }
 };
 exports.ContactRequestService = ContactRequestService;

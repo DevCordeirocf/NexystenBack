@@ -62,7 +62,7 @@ __decorate([
     (0, swagger_1.ApiPropertyOptional)({ description: 'Lista de IDs das categorias associadas', example: ['uuid-categoria-1'] }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsArray)({ message: 'Os categoryIds devem ser um array.' }),
-    (0, class_validator_1.IsString)({ each: true, message: 'Cada categoryId deve ser um UUID em formato de string.' }),
+    (0, class_validator_1.IsUUID)('4', { each: true, message: 'Cada categoryId deve ser um UUID valido.' }),
     __metadata("design:type", Array)
 ], CreateProductDto.prototype, "categoryIds", void 0);
 //# sourceMappingURL=create-product.dto.js.map
