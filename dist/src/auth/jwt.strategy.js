@@ -14,13 +14,14 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const passport_jwt_1 = require("passport-jwt");
 const prisma_service_1 = require("../database/prisma.service");
+const jwt_config_1 = require("./jwt.config");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
     prisma;
     constructor(prisma) {
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: process.env.JWT_SECRET || 'fallback_secret',
+            secretOrKey: (0, jwt_config_1.getJwtSecret)(),
         });
         this.prisma = prisma;
     }

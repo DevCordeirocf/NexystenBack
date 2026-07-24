@@ -1,22 +1,23 @@
-import { IsEmail, IsString, MinLength, IsOptional, IsPhoneNumber } from 'class-validator';
+import { IsEmail, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { StrongPassword } from './password-policy';
 
 export class RegisterCustomerDto {
-  @ApiProperty({ description: 'Endereço de e-mail do cliente', example: 'cliente@exemplo.com' })
-  @IsEmail({}, { message: 'O email deve ser um endereço de e-mail válido.' })
+  @ApiProperty({ description: 'Endereco de e-mail do cliente', example: 'cliente@exemplo.com' })
+  @IsEmail({}, { message: 'O email deve ser um endereco de e-mail valido.' })
   email!: string;
 
-  @ApiProperty({ description: 'Senha do cliente', example: 'senha123', minLength: 6 })
+  @ApiProperty({ description: 'Senha do cliente', example: 'SenhaForte123', minLength: 10 })
   @IsString({ message: 'A senha deve ser uma string.' })
-  @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres.' })
+  @StrongPassword()
   password!: string;
 
-  @ApiPropertyOptional({ description: 'Nome completo do cliente', example: 'João Silva' })
+  @ApiPropertyOptional({ description: 'Nome completo do cliente', example: 'Joao Silva' })
   @IsOptional()
   @IsString({ message: 'O nome deve ser uma string.' })
   name?: string;
 
   @IsOptional()
-  @IsPhoneNumber('BR', { message: 'O telefone deve ser um número de telefone válido do Brasil.' })
+  @IsPhoneNumber('BR', { message: 'O telefone deve ser um numero de telefone valido do Brasil.' })
   phone?: string;
 }

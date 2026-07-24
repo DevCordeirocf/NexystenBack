@@ -22,7 +22,8 @@ export class AuthService {
       throw new UnauthorizedException('Apenas um MASTER_ADMIN pode criar outros administradores master.');
     }
 
-    const { email, password, name } = registerMasterDto;
+    const { password, name } = registerMasterDto;
+    const email = this.normalizeEmail(registerMasterDto.email);
 
     const existingUser = await this.prisma.user.findFirst({
       where: { email, tenantId: null, role: UserRole.MASTER_ADMIN },
@@ -53,7 +54,8 @@ export class AuthService {
       throw new UnauthorizedException('Apenas um MASTER_ADMIN pode criar administradores de loja.');
     }
 
-    const { email, password, name, tenantId } = registerTenantAdminDto;
+    const { password, name, tenantId } = registerTenantAdminDto;
+    const email = this.normalizeEmail(registerTenantAdminDto.email);
 
     const existingUser = await this.prisma.user.findFirst({
       where: { email, tenantId },
@@ -94,7 +96,8 @@ export class AuthService {
    * Registra um cliente final vinculado a uma loja específica
    */
   async registerCustomer(registerCustomerDto: RegisterCustomerDto, tenantId: string) {
-    const { email, password, name, phone } = registerCustomerDto;
+    const { password, name, phone } = registerCustomerDto;
+    const email = this.normalizeEmail(registerCustomerDto.email);
 
     if (!tenantId) {
       throw new BadRequestException('Tenant ID e obrigatorio para cadastrar um cliente.');
@@ -127,7 +130,8 @@ export class AuthService {
    * Realiza a autenticação do usuário e gera o token JWT
    */
   async login(loginUserDto: LoginUserDto, tenantId?: string) {
-    const { email, password } = loginUserDto;
+    const { password } = loginUserDto;
+    const email = this.normalizeEmail(loginUserDto.email);
 
     const user = tenantId
       ? await this.prisma.user.findFirst({ where: { email, tenantId } })
@@ -160,5 +164,9 @@ export class AuthService {
    */
   async validateUser(payload: any) {
     return this.prisma.user.findUnique({ where: { id: payload.sub } });
+  }
+
+  private normalizeEmail(email: string) {
+    return email.trim().toLowerCase();
   }
 }

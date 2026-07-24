@@ -15,6 +15,7 @@ const tenant_module_1 = require("../tenant/tenant.module");
 const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
 const jwt_strategy_1 = require("./jwt.strategy");
+const jwt_config_1 = require("./jwt.config");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -24,7 +25,7 @@ exports.AuthModule = AuthModule = __decorate([
             prisma_module_1.PrismaModule,
             passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
             jwt_1.JwtModule.register({
-                secret: process.env.JWT_SECRET || 'fallback_secret',
+                secret: (0, jwt_config_1.getJwtSecret)(),
                 signOptions: { expiresIn: process.env.JWT_EXPIRATION || '60m' },
             }),
             tenant_module_1.TenantModule,

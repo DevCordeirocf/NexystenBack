@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterMasterDto = void 0;
 const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
+const password_policy_1 = require("./password-policy");
 class RegisterMasterDto {
     email;
     password;
@@ -19,14 +20,14 @@ class RegisterMasterDto {
 }
 exports.RegisterMasterDto = RegisterMasterDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Endereço de e-mail do administrador master', example: 'admin@nexysten.com' }),
-    (0, class_validator_1.IsEmail)({}, { message: 'O email deve ser um endereço de e-mail válido.' }),
+    (0, swagger_1.ApiProperty)({ description: 'Endereco de e-mail do administrador master', example: 'admin@nexysten.com' }),
+    (0, class_validator_1.IsEmail)({}, { message: 'O email deve ser um endereco de e-mail valido.' }),
     __metadata("design:type", String)
 ], RegisterMasterDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Senha do administrador master', example: 'senha123', minLength: 6 }),
+    (0, swagger_1.ApiProperty)({ description: 'Senha do administrador master', example: 'SenhaForte123', minLength: 10 }),
     (0, class_validator_1.IsString)({ message: 'A senha deve ser uma string.' }),
-    (0, class_validator_1.MinLength)(6, { message: 'A senha deve ter no mínimo 6 caracteres.' }),
+    (0, password_policy_1.StrongPassword)(),
     __metadata("design:type", String)
 ], RegisterMasterDto.prototype, "password", void 0);
 __decorate([

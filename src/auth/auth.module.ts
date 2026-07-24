@@ -6,13 +6,14 @@ import { TenantModule } from '../tenant/tenant.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
+import { getJwtSecret } from './jwt.config';
 
 @Module({
   imports: [
     PrismaModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'fallback_secret',
+      secret: getJwtSecret(),
       signOptions: { expiresIn: (process.env.JWT_EXPIRATION as any) || '60m' },
     }),
     TenantModule, // Import TenantModule to use TenantContextService

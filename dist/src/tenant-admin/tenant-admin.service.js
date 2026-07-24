@@ -103,19 +103,17 @@ let TenantAdminService = class TenantAdminService {
         }
         return tenant;
     }
-    async findAllUsersByTenant(tenantId) {
-        await this.findOne(tenantId);
-        return this.prisma.user.findMany({
-            where: { tenantId },
+    async findAllUsersByTenant(id) {
+        return await this.prisma.user.findMany({
+            where: { tenantId: id },
             select: {
                 id: true,
                 email: true,
                 name: true,
                 phone: true,
                 role: true,
-                tenantId: true,
                 createdAt: true,
-                updatedAt: true,
+                updatedAt: true
             },
             orderBy: { createdAt: 'desc' },
         });

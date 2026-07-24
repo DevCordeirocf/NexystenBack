@@ -44,15 +44,14 @@ export declare class TenantAdminService {
         logoUrl: string | null;
         whatsapp: string | null;
     }>;
-    findAllUsersByTenant(tenantId: string): Promise<{
+    findAllUsersByTenant(id: string): Promise<{
         id: string;
         name: string | null;
         createdAt: Date;
         updatedAt: Date;
-        tenantId: string | null;
-        role: import("@prisma/client").$Enums.UserRole;
         email: string;
         phone: string | null;
+        role: import("@prisma/client").$Enums.UserRole;
     }[]>;
     update(id: string, updateTenantDto: UpdateTenantDto): Promise<{
         id: string;

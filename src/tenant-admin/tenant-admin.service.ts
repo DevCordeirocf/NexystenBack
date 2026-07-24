@@ -1,3 +1,4 @@
+import { IsEmail } from 'class-validator';
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { CreateTenantDto } from './dto/create-tenant.dto';
@@ -78,20 +79,17 @@ export class TenantAdminService {
     return tenant;
   }
 
-  async findAllUsersByTenant(tenantId: string) {
-    await this.findOne(tenantId);
-
-    return this.prisma.user.findMany({
-      where: { tenantId },
+  async findAllUsersByTenant(id: string) {
+    return await this.prisma.user.findMany({
+      where: { tenantId: id },
       select: {
         id: true,
         email: true,
         name: true,
         phone: true,
         role: true,
-        tenantId: true,
         createdAt: true,
-        updatedAt: true,
+        updatedAt: true
       },
       orderBy: { createdAt: 'desc' },
     });

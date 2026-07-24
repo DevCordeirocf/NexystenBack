@@ -59,7 +59,8 @@ let AuthService = class AuthService {
         if (!currentUser || currentUser.role !== client_1.UserRole.MASTER_ADMIN) {
             throw new common_1.UnauthorizedException('Apenas um MASTER_ADMIN pode criar outros administradores master.');
         }
-        const { email, password, name } = registerMasterDto;
+        const { password, name } = registerMasterDto;
+        const email = this.normalizeEmail(registerMasterDto.email);
         const existingUser = await this.prisma.user.findFirst({
             where: { email, tenantId: null, role: client_1.UserRole.MASTER_ADMIN },
         });
@@ -81,7 +82,8 @@ let AuthService = class AuthService {
         if (!currentUser || currentUser.role !== client_1.UserRole.MASTER_ADMIN) {
             throw new common_1.UnauthorizedException('Apenas um MASTER_ADMIN pode criar administradores de loja.');
         }
-        const { email, password, name, tenantId } = registerTenantAdminDto;
+        const { password, name, tenantId } = registerTenantAdminDto;
+        const email = this.normalizeEmail(registerTenantAdminDto.email);
         const existingUser = await this.prisma.user.findFirst({
             where: { email, tenantId },
         });
@@ -111,7 +113,8 @@ let AuthService = class AuthService {
         return { message: 'Administrador de Loja registrado com sucesso' };
     }
     async registerCustomer(registerCustomerDto, tenantId) {
-        const { email, password, name, phone } = registerCustomerDto;
+        const { password, name, phone } = registerCustomerDto;
+        const email = this.normalizeEmail(registerCustomerDto.email);
         if (!tenantId) {
             throw new common_1.BadRequestException('Tenant ID e obrigatorio para cadastrar um cliente.');
         }
@@ -135,7 +138,8 @@ let AuthService = class AuthService {
         return { message: 'Cliente registrado com sucesso', userId: user.id };
     }
     async login(loginUserDto, tenantId) {
-        const { email, password } = loginUserDto;
+        const { password } = loginUserDto;
+        const email = this.normalizeEmail(loginUserDto.email);
         const user = tenantId
             ? await this.prisma.user.findFirst({ where: { email, tenantId } })
             : await this.prisma.user.findFirst({
@@ -160,6 +164,9 @@ let AuthService = class AuthService {
     }
     async validateUser(payload) {
         return this.prisma.user.findUnique({ where: { id: payload.sub } });
+    }
+    normalizeEmail(email) {
+        return email.trim().toLowerCase();
     }
 };
 exports.AuthService = AuthService;

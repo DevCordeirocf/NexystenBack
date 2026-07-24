@@ -49,10 +49,9 @@ export declare class TenantAdminController {
         name: string | null;
         createdAt: Date;
         updatedAt: Date;
-        tenantId: string | null;
-        role: import("@prisma/client").$Enums.UserRole;
         email: string;
         phone: string | null;
+        role: import("@prisma/client").$Enums.UserRole;
     }[]>;
     update(id: string, updateTenantDto: UpdateTenantDto): Promise<{
         id: string;
