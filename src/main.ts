@@ -41,14 +41,21 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
+      // Allow requests with no Origin only in non-production (local development).
+      // In production, reject requests without an Origin header to avoid
+      // accidental CORS bypasses by non-browser clients or forged requests.
       if (!origin) {
-        callback(null, true);
+        if (process.env.NODE_ENV !== 'production') {
+          callback(null, true);
+          return;
+        }
+        callback(new Error('Origem ausente nao permitida pelo CORS em producao'));
         return;
       }
 
       if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
-      callback(null, origin); 
-      return;
+        callback(null, origin);
+        return;
       }
 
       callback(new Error('Origem nao permitida pelo CORS'));

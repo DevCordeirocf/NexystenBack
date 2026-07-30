@@ -14,8 +14,15 @@ export class ContactRequestService {
   /**
    * Cria uma nova solicitação de contato (Lead) vinculada a um produto e tenant.
    */
-  async create(createContactRequestDto: CreateContactRequestDto) {
+  async create(createContactRequestDto: CreateContactRequestDto, user?: any) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
+n    // If request is authenticated, bind the contact request to the authenticated user.
+    // If request is not authenticated, clients are not allowed to supply a userId.
+    if (user) {
+      createContactRequestDto.userId = user.userId;
+    } else if (createContactRequestDto.userId) {
+      throw new BadRequestException('Não é permitido informar userId sem autenticação.');
+    }
 
     // Valida se o produto existe e pertence ao mesmo tenant da solicitação
     const product = await this.prisma.product.findFirst({

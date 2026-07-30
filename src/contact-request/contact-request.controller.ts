@@ -10,6 +10,7 @@ import {
   HttpStatus,
   UseGuards,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiHeader, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { GetUser } from '../auth/get-user.decorator';
@@ -42,10 +43,9 @@ export class ContactRequestController {
     @Body() createContactRequestDto: CreateContactRequestDto,
     @GetUser() user?: any,
   ) {
-    if (user) {
-      createContactRequestDto.userId = user.userId;
-    }
-    return this.contactRequestService.create(createContactRequestDto);
+    // Delegate user binding/validation to the service layer to keep the
+    // controller thin and the business rules centralized.
+    return this.contactRequestService.create(createContactRequestDto, user);
   }
 
   /**
