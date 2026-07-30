@@ -16,7 +16,7 @@ export class ContactRequestService {
    */
   async create(createContactRequestDto: CreateContactRequestDto, user?: any) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
-n    // If request is authenticated, bind the contact request to the authenticated user.
+    // If request is authenticated, bind the contact request to the authenticated user.
     // If request is not authenticated, clients are not allowed to supply a userId.
     if (user) {
       createContactRequestDto.userId = user.userId;
