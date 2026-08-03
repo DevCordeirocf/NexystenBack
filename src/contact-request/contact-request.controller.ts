@@ -43,14 +43,9 @@ export class ContactRequestController {
     @Body() createContactRequestDto: CreateContactRequestDto,
     @GetUser() user?: any,
   ) {
-
-    if (user) {
-      createContactRequestDto.userId = user.userId;
-    } else if (createContactRequestDto.userId) {
-      throw new BadRequestException('Não é permitido informar userId sem autenticação.');
-    }
-
-    return this.contactRequestService.create(createContactRequestDto);
+    // Delegate user binding/validation to the service layer to keep the
+    // controller thin and the business rules centralized.
+    return this.contactRequestService.create(createContactRequestDto, user);
   }
 
   /**

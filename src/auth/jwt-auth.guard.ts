@@ -14,8 +14,23 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       context.getHandler(),
       context.getClass(),
     ]);
+
+    // If the route is public, allow unauthenticated access if there is no
+    // Authorization header. If an Authorization header is present, delegate
+    // to the passport JWT strategy so request.user is populated when the token
+    // is valid.
     const request = context.switchToHttp().getRequest();
-    const authHeader = request?.headers?.authorization || request?.headers?.Authorization;
+    const headers: Record<string, any> = request?.headers || {};
+    // Lookup the Authorization header case-insensitively to avoid bypasses from unusual casing
+    let authHeader: string | undefined = undefined;
+    if (headers['authorization']) {
+      authHeader = headers['authorization'];
+    } else {
+      const foundKey = Object.keys(headers).find((k) => k && k.toLowerCase() === 'authorization');
+      if (foundKey) {
+        authHeader = headers[foundKey];
+      }
+    }
 
     if (isPublic && !authHeader) {
       return true;
