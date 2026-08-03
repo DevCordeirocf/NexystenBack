@@ -75,12 +75,12 @@ export class RateLimitMiddleware implements NestMiddleware {
   }
 
   private getClientIp(request: Request) {
-    const forwardedFor = request.headers['x-forwarded-for'];
-
-    if (typeof forwardedFor === 'string' && forwardedFor.length > 0) {
-      return forwardedFor.split(',')[0].trim();
-    }
-
-    return request.ip || request.socket.remoteAddress || 'unknown';
+    // Rely on Express' request.ip which respects the app's "trust proxy" setting.
+    // Do NOT trust X-Forwarded-For directly here unless you have validated the
+    // upstream proxy is trusted. The application config (src/main.ts) should
+    // configure `app.set('trust proxy', ...)` appropriately for your deployment.
+    const ip = (request as any).ip || request.socket.remoteAddress || 'unknown';
+    return ip as string;
   }
 }
+  

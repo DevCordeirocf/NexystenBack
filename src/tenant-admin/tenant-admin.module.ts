@@ -7,7 +7,8 @@ import { PrismaModule } from '../database/prisma.module';
 import { AuthModule } from '../auth/auth.module';
 import '../config/load-env';
 
-const devControllers = process.env.NODE_ENV === 'production' ? [] : [TenantDevController];
+const devEnabled = process.env.ENABLE_DEV_ROUTES === 'true';
+const devControllers = devEnabled ? [TenantDevController] : [];
 
 @Module({
   imports: [PrismaModule, AuthModule],

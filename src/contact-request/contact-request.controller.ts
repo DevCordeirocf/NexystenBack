@@ -10,6 +10,7 @@ import {
   HttpStatus,
   UseGuards,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiHeader, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { GetUser } from '../auth/get-user.decorator';
@@ -42,9 +43,13 @@ export class ContactRequestController {
     @Body() createContactRequestDto: CreateContactRequestDto,
     @GetUser() user?: any,
   ) {
+
     if (user) {
       createContactRequestDto.userId = user.userId;
+    } else if (createContactRequestDto.userId) {
+      throw new BadRequestException('Não é permitido informar userId sem autenticação.');
     }
+
     return this.contactRequestService.create(createContactRequestDto);
   }
 

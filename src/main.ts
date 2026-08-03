@@ -42,13 +42,17 @@ async function bootstrap() {
   app.enableCors({
     origin: (origin, callback) => {
       if (!origin) {
-        callback(null, true);
+        if (process.env.NODE_ENV !== 'production') {
+          callback(null, true);
+          return;
+        }
+        callback(new Error('Origem ausente nao permitida pelo CORS em producao'));
         return;
       }
 
       if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
-      callback(null, origin); 
-      return;
+        callback(null, origin);
+        return;
       }
 
       callback(new Error('Origem nao permitida pelo CORS'));
