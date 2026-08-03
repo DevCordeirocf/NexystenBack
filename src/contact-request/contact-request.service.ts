@@ -128,9 +128,34 @@ export class ContactRequestService {
     // Garante que a solicitação existe e pertence ao tenant antes de atualizar
     await this.findOne(id);
 
+    // Only pass fields that actually exist in the Prisma model to avoid runtime errors
+    // (e.g. DTOs may contain transient fields like `internalNotes` that aren't yet in the schema)
+    const updatableFields = [
+      'status',
+      'message',
+      'customerName',
+      'customerEmail',
+      'customerPhone',
+      'userId',
+      'productId',
+      'tenantId',
+    ];
+
+    const data: Record<string, any> = {};
+    for (const [key, value] of Object.entries(updateContactRequestDto as any)) {
+      if (value === undefined) continue; // skip undefined values
+      if (updatableFields.includes(key)) {
+        data[key] = value;
+      }
+    }
+
+    if (Object.keys(data).length === 0) {
+      throw new BadRequestException('Nenhum campo atualizável válido foi informado.');
+    }
+
     return this.prisma.contactRequest.update({
       where: { id, tenantId },
-      data: updateContactRequestDto,
+      data,
       include: {
         product: true,
       },
