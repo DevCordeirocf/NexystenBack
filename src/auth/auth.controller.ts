@@ -1,6 +1,7 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiHeader, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { User } from '@prisma/client';
 import { RegisterMasterDto } from './dto/register-master.dto';
 import { RegisterTenantAdminDto } from './dto/register-tenant-admin.dto';
 import { RegisterCustomerDto } from './dto/register-customer.dto';
@@ -22,7 +23,7 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   registerMaster(
     @Body() registerMasterDto: RegisterMasterDto,
-    @GetUser() currentUser: any
+    @GetUser() currentUser: User
   ) {
     return this.authService.registerMaster(registerMasterDto, currentUser);
   }
@@ -34,7 +35,7 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   registerTenantAdmin(
     @Body() registerTenantAdminDto: RegisterTenantAdminDto,
-    @GetUser() currentUser: any
+    @GetUser() currentUser: User
   ) {
     return this.authService.registerTenantAdmin(registerTenantAdminDto, currentUser);
   }
