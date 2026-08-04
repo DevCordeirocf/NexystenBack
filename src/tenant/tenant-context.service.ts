@@ -3,7 +3,8 @@ import { AsyncLocalStorage } from 'async_hooks';
 
 // Define a estrutura de dados que será armazenada no contexto
 interface TenantStore {
-  tenantId: string;
+  tenantId?: string;
+  requestId?: string;
 }
 
 // Cria a instância do AsyncLocalStorage para o nosso contexto multi-tenant.
@@ -23,10 +24,14 @@ export class TenantContextService {
     if (!tenantId) {
       throw new InternalServerErrorException('Tenant ID deve ser fornecido para iniciar o contexto.');
     }
-    
+
+    // Preserve existing requestId (if any)
+    const current = tenantStore.getStore();
+    const requestId = current?.requestId;
+
     // O método run() do ALS garante que o store (TenantStore)
     // estará disponível apenas para a execução deste callback e suas chamadas subsequentes.
-    tenantStore.run({ tenantId }, callback);
+    tenantStore.run({ tenantId, requestId }, callback);
   }
 
   /**

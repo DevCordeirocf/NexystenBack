@@ -1,5 +1,6 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware, HttpException } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
+import { Logger } from 'nestjs-pino';
 
 type RateLimitRule = {
   name: string;
@@ -15,7 +16,6 @@ type RateLimitEntry = {
 
 @Injectable()
 export class RateLimitMiddleware implements NestMiddleware {
-  private readonly logger = new (class { log = console.log; error = console.error })();
   private redisClient: any | null = null;
   private readonly hits = new Map<string, RateLimitEntry>();
 
@@ -42,7 +42,7 @@ export class RateLimitMiddleware implements NestMiddleware {
     },
   ];
 
-  constructor() {
+  constructor(private readonly logger: Logger) {
     const redisUrl = process.env.REDIS_URL;
     if (redisUrl) {
       try {
@@ -52,18 +52,17 @@ export class RateLimitMiddleware implements NestMiddleware {
         this.redisClient = new IORedis(redisUrl);
         this.logger.log('RateLimitMiddleware: connected to Redis');
       } catch (err) {
-        this.logger.error('RateLimitMiddleware: failed to init Redis client, falling back to in-memory', err);
+        this.logger.error('RateLimitMiddleware: failed to init Redis client, falling back to in-memory', { err: String(err) });
         this.redisClient = null;
       }
     }
   }
 
-  async use(request: Request, response: Response, next: NextFunction) {
+  async use(request: Request & { requestId?: string }, _response: Response, _next: NextFunction) {
     const rule = this.rules.find((item) => item.match(request));
 
     if (!rule) {
-      next();
-      return;
+      return _next();
     }
 
     const clientIp = this.getClientIp(request);
@@ -81,20 +80,14 @@ export class RateLimitMiddleware implements NestMiddleware {
         if (count > rule.maxRequests) {
           const ttl = await this.redisClient.ttl(key);
           const retryAfterSeconds = ttl > 0 ? ttl : windowSeconds;
-          response.setHeader('Retry-After', String(retryAfterSeconds));
-          response.status(429).json({
-            statusCode: 429,
-            message: 'Muitas requisicoes. Tente novamente mais tarde.',
-            retryAfterSeconds,
-          });
-          return;
+          this.logger.warn({ rule: rule.name, clientIp, requestId: request.requestId, retryAfterSeconds }, 'Rate limit exceeded');
+          throw new HttpException({ statusCode: 429, message: 'Muitas requisicoes. Tente novamente mais tarde.', retryAfterSeconds }, 429);
         }
 
-        next();
-        return;
+        return _next();
       } catch (err) {
         // If Redis fails unexpectedly, log and fall back to in-memory behavior
-        this.logger.error('RateLimitMiddleware: Redis error, falling back to in-memory limiter', err);
+        this.logger.error({ err: String(err), requestId: request.requestId }, 'RateLimitMiddleware: Redis error, falling back to in-memory limiter');
       }
     }
 
@@ -104,23 +97,17 @@ export class RateLimitMiddleware implements NestMiddleware {
 
     if (!entry || entry.resetAt <= now) {
       this.hits.set(key, { count: 1, resetAt: now + rule.windowMs });
-      next();
-      return;
+      return _next();
     }
 
     if (entry.count >= rule.maxRequests) {
       const retryAfterSeconds = Math.ceil((entry.resetAt - now) / 1000);
-      response.setHeader('Retry-After', String(retryAfterSeconds));
-      response.status(429).json({
-        statusCode: 429,
-        message: 'Muitas requisicoes. Tente novamente mais tarde.',
-        retryAfterSeconds,
-      });
-      return;
+      this.logger.warn({ rule: rule.name, clientIp, requestId: request.requestId, retryAfterSeconds }, 'Rate limit exceeded (in-memory)');
+      throw new HttpException({ statusCode: 429, message: 'Muitas requisicoes. Tente novamente mais tarde.', retryAfterSeconds }, 429);
     }
 
     entry.count += 1;
-    next();
+    return _next();
   }
 
   private getClientIp(request: Request) {
