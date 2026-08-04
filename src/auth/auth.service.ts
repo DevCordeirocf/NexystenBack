@@ -5,7 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { RegisterCustomerDto } from './dto/register-customer.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import { UserRole } from '@prisma/client';
+import { UserRole, User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +17,7 @@ export class AuthService {
   /**
    * Registra um novo MASTER_ADMIN (Apenas outro MASTER_ADMIN pode realizar esta ação)
    */
-  async registerMaster(registerMasterDto: any, currentUser: any) {
+  async registerMaster(registerMasterDto: RegisterMasterDto, currentUser: User) {
     if (!currentUser || currentUser.role !== UserRole.MASTER_ADMIN) {
       throw new UnauthorizedException('Apenas um MASTER_ADMIN pode criar outros administradores master.');
     }
@@ -49,7 +49,7 @@ export class AuthService {
   /**
    * Registra um novo TENANT_ADMIN vinculado a uma loja (Apenas MASTER_ADMIN pode realizar esta ação)
    */
-  async registerTenantAdmin(registerTenantAdminDto: any, currentUser: any) {
+  async registerTenantAdmin(registerTenantAdminDto: RegisterTenantAdminDto, currentUser: User) {
     if (!currentUser || currentUser.role !== UserRole.MASTER_ADMIN) {
       throw new UnauthorizedException('Apenas um MASTER_ADMIN pode criar administradores de loja.');
     }
