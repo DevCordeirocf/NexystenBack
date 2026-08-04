@@ -59,7 +59,7 @@ export class TenantDevController {
 
     const uniqueSuffix = Date.now().toString().slice(-4);
 
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.$transaction(async (tx: any) => {
       // 1. Criar Categorias
       const catAneis = await tx.category.create({
         data: { name: `Anéis ${uniqueSuffix}`, description: 'Anéis de ouro e prata', tenantId }

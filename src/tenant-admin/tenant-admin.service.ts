@@ -21,7 +21,7 @@ export class TenantAdminService {
       throw new BadRequestException(`Já existe uma loja cadastrada com o nome '${name}'.`);
     }
 
-    return this.prisma.$transaction(async (prisma) => {
+    return this.prisma.$transaction(async (prisma: any) => {
       // Criação da loja
       const tenant = await prisma.tenantStore.create({
         data: {

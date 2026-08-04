@@ -16,6 +16,7 @@ import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { S3Service } from './s3.service';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
@@ -136,9 +137,6 @@ export class UploadController {
     const useObjectStorage = (process.env.USE_R2 === 'true') || !!process.env.R2_BUCKET;
 
     if (useObjectStorage) {
-      // Lazy import to avoid forcing AWS deps when not used
-      const { S3Service } = await import('./s3.service');
-
       const bucket = process.env.R2_BUCKET as string;
       if (!bucket) {
         throw new BadRequestException('R2_BUCKET nao configurado.');

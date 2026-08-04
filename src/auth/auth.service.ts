@@ -5,6 +5,8 @@ import * as bcrypt from 'bcryptjs';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { RegisterCustomerDto } from './dto/register-customer.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { RegisterMasterDto } from './dto/register-master.dto';
+import { RegisterTenantAdminDto } from './dto/register-tenant-admin.dto';
 import { UserRole, User } from '@prisma/client';
 
 @Injectable()
