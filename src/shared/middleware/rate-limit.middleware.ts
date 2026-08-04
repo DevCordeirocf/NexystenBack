@@ -16,7 +16,7 @@ type RateLimitEntry = {
 @Injectable()
 export class RateLimitMiddleware implements NestMiddleware {
   private readonly logger = new (class { log = console.log; error = console.error })();
-  private redisClient: import('ioredis').Redis | null = null;
+  private redisClient: any | null = null;
   private readonly hits = new Map<string, RateLimitEntry>();
 
   private readonly rules: RateLimitRule[] = [
