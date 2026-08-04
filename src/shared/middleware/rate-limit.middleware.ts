@@ -15,6 +15,8 @@ type RateLimitEntry = {
 
 @Injectable()
 export class RateLimitMiddleware implements NestMiddleware {
+  private readonly logger = new (class { log = console.log; error = console.error })();
+  private redisClient: import('ioredis').Redis | null = null;
   private readonly hits = new Map<string, RateLimitEntry>();
 
   private readonly rules: RateLimitRule[] = [
@@ -40,7 +42,23 @@ export class RateLimitMiddleware implements NestMiddleware {
     },
   ];
 
-  use(request: Request, response: Response, next: NextFunction) {
+  constructor() {
+    const redisUrl = process.env.REDIS_URL;
+    if (redisUrl) {
+      try {
+        // lazy-import to avoid requiring ioredis when not needed
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const IORedis = require('ioredis');
+        this.redisClient = new IORedis(redisUrl);
+        this.logger.log('RateLimitMiddleware: connected to Redis');
+      } catch (err) {
+        this.logger.error('RateLimitMiddleware: failed to init Redis client, falling back to in-memory', err);
+        this.redisClient = null;
+      }
+    }
+  }
+
+  async use(request: Request, response: Response, next: NextFunction) {
     const rule = this.rules.find((item) => item.match(request));
 
     if (!rule) {
@@ -48,9 +66,40 @@ export class RateLimitMiddleware implements NestMiddleware {
       return;
     }
 
-    const now = Date.now();
     const clientIp = this.getClientIp(request);
     const key = `${rule.name}:${clientIp}`;
+
+    if (this.redisClient) {
+      try {
+        // Use Redis INCR with EXPIRE to manage counts atomically
+        const windowSeconds = Math.ceil(rule.windowMs / 1000);
+        const count = await this.redisClient.incr(key);
+        if (count === 1) {
+          await this.redisClient.expire(key, windowSeconds);
+        }
+
+        if (count > rule.maxRequests) {
+          const ttl = await this.redisClient.ttl(key);
+          const retryAfterSeconds = ttl > 0 ? ttl : windowSeconds;
+          response.setHeader('Retry-After', String(retryAfterSeconds));
+          response.status(429).json({
+            statusCode: 429,
+            message: 'Muitas requisicoes. Tente novamente mais tarde.',
+            retryAfterSeconds,
+          });
+          return;
+        }
+
+        next();
+        return;
+      } catch (err) {
+        // If Redis fails unexpectedly, log and fall back to in-memory behavior
+        this.logger.error('RateLimitMiddleware: Redis error, falling back to in-memory limiter', err);
+      }
+    }
+
+    // Fallback in-memory implementation (per-instance)
+    const now = Date.now();
     const entry = this.hits.get(key);
 
     if (!entry || entry.resetAt <= now) {
@@ -75,10 +124,6 @@ export class RateLimitMiddleware implements NestMiddleware {
   }
 
   private getClientIp(request: Request) {
-    // Rely on Express' request.ip which respects the app's "trust proxy" setting.
-    // Do NOT trust X-Forwarded-For directly here unless you have validated the
-    // upstream proxy is trusted. The application config (src/main.ts) should
-    // configure `app.set('trust proxy', ...)` appropriately for your deployment.
     const ip = (request as any).ip || request.socket.remoteAddress || 'unknown';
     return ip as string;
   }
