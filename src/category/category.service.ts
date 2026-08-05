@@ -3,6 +3,7 @@ import { PrismaService } from '../database/prisma.service';
 import { TenantContextService } from '../tenant/tenant-context.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { PrismaErrorHandler } from '../shared/prisma-error.handler';
 
 @Injectable()
 export class CategoryService {
@@ -15,38 +16,50 @@ export class CategoryService {
     const tenantId = this.tenantContextService.getRequiredTenantId();
     const { tenantId: _ignoredTenantId, ...data } = createCategoryDto;
 
-    return this.prisma.category.create({
-      data: {
-        ...data,
-        tenantId,
-      },
-    });
+    try {
+      return await this.prisma.category.create({
+        data: {
+          ...data,
+          tenantId,
+        },
+      });
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'Category' });
+    }
   }
 
   async findAll() {
     const tenantId = this.tenantContextService.getRequiredTenantId();
 
-    return this.prisma.category.findMany({
-      where: { tenantId },
-      orderBy: { createdAt: 'desc' },
-    });
+    try {
+      return await this.prisma.category.findMany({
+        where: { tenantId },
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'Category' });
+    }
   }
 
   async findOne(id: string) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
 
-    const category = await this.prisma.category.findFirst({
-      where: {
-        id,
-        tenantId,
-      },
-    });
+    try {
+      const category = await this.prisma.category.findFirst({
+        where: {
+          id,
+          tenantId,
+        },
+      });
 
-    if (!category) {
-      throw new NotFoundException(`Categoria com ID "${id}" nao encontrada para este tenant.`);
+      if (!category) {
+        throw new NotFoundException(`Categoria com ID "${id}" nao encontrada para este tenant.`);
+      }
+
+      return category;
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'Category' });
     }
-
-    return category;
   }
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {
@@ -55,13 +68,17 @@ export class CategoryService {
 
     await this.findOne(id);
 
-    return this.prisma.category.update({
-      where: {
-        id,
-        tenantId,
-      },
-      data,
-    });
+    try {
+      return await this.prisma.category.update({
+        where: {
+          id,
+          tenantId,
+        },
+        data,
+      });
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'Category' });
+    }
   }
 
   async remove(id: string) {
@@ -69,11 +86,15 @@ export class CategoryService {
 
     await this.findOne(id);
 
-    return this.prisma.category.delete({
-      where: {
-        id,
-        tenantId,
-      },
-    });
+    try {
+      return await this.prisma.category.delete({
+        where: {
+          id,
+          tenantId,
+        },
+      });
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'Category' });
+    }
   }
 }

@@ -8,6 +8,8 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterMasterDto } from './dto/register-master.dto';
 import { RegisterTenantAdminDto } from './dto/register-tenant-admin.dto';
 import { UserRole, User } from '@prisma/client';
+import { RegisterMasterDto } from './dto/register-master.dto';
+import { RegisterTenantAdminDto } from './dto/register-tenant-admin.dto';
 
 @Injectable()
 export class AuthService {

@@ -3,6 +3,7 @@ import { PrismaService } from '../database/prisma.service';
 import { TenantContextService } from '../tenant/tenant-context.service';
 import { CreateContactRequestDto } from './dto/create-contact-request.dto';
 import { UpdateContactRequestDto } from './dto/update-contact-request.dto';
+import { PrismaErrorHandler } from '../shared/prisma-error.handler';
 
 @Injectable()
 export class ContactRequestService {
@@ -24,30 +25,34 @@ export class ContactRequestService {
       throw new BadRequestException('Não é permitido informar userId sem autenticação.');
     }
 
-    // Valida se o produto existe e pertence ao mesmo tenant da solicitação
-    const product = await this.prisma.product.findFirst({
-      where: {
-        id: createContactRequestDto.productId,
-        tenantId,
-      },
-    });
+    try {
+      // Valida se o produto existe e pertence ao mesmo tenant da solicitação
+      const product = await this.prisma.product.findFirst({
+        where: {
+          id: createContactRequestDto.productId,
+          tenantId,
+        },
+      });
 
-    if (!product) {
-      throw new NotFoundException(
-        `Produto com ID "${createContactRequestDto.productId}" não encontrado para este tenant.`,
-      );
+      if (!product) {
+        throw new NotFoundException(
+          `Produto com ID "${createContactRequestDto.productId}" não encontrado para este tenant.`,
+        );
+      }
+
+      if (createContactRequestDto.userId) {
+        await this.ensureUserBelongsToTenant(createContactRequestDto.userId, tenantId);
+      }
+
+      return await this.prisma.contactRequest.create({
+        data: {
+          ...createContactRequestDto,
+          tenantId,
+        },
+      });
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'ContactRequest' });
     }
-
-    if (createContactRequestDto.userId) {
-      await this.ensureUserBelongsToTenant(createContactRequestDto.userId, tenantId);
-    }
-
-    return this.prisma.contactRequest.create({
-      data: {
-        ...createContactRequestDto,
-        tenantId,
-      },
-    });
   }
 
   /**
@@ -57,30 +62,34 @@ export class ContactRequestService {
   async findAll(status?: string) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
 
-    return this.prisma.contactRequest.findMany({
-      where: { 
-        tenantId,
-        status: status ? status : undefined,
-      },
-      include: {
-        product: {
-          select: {
-            id: true,
-            name: true,
-            images: true,
-          }
+    try {
+      return await this.prisma.contactRequest.findMany({
+        where: { 
+          tenantId,
+          status: status ? status : undefined,
         },
-        user: {
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            phone: true,
+        include: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+              images: true,
+            }
+          },
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              phone: true,
+            },
           },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'ContactRequest' });
+    }
   }
 
   /**
@@ -89,31 +98,35 @@ export class ContactRequestService {
   async findOne(id: string) {
     const tenantId = this.tenantContextService.getRequiredTenantId();
 
-    const contactRequest = await this.prisma.contactRequest.findFirst({
-      where: {
-        id,
-        tenantId,
-      },
-      include: {
-        product: true,
-        user: {
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            phone: true,
+    try {
+      const contactRequest = await this.prisma.contactRequest.findFirst({
+        where: {
+          id,
+          tenantId,
+        },
+        include: {
+          product: true,
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              phone: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (!contactRequest) {
-      throw new NotFoundException(
-        `Solicitação de contato com ID "${id}" não encontrada para este tenant.`,
-      );
+      if (!contactRequest) {
+        throw new NotFoundException(
+          `Solicitação de contato com ID "${id}" não encontrada para este tenant.`,
+        );
+      }
+
+      return contactRequest;
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'ContactRequest' });
     }
-
-    return contactRequest;
   }
 
   /**
@@ -153,13 +166,17 @@ export class ContactRequestService {
       throw new BadRequestException('Nenhum campo atualizável válido foi informado.');
     }
 
-    return this.prisma.contactRequest.update({
-      where: { id, tenantId },
-      data,
-      include: {
-        product: true,
-      },
-    });
+    try {
+      return await this.prisma.contactRequest.update({
+        where: { id, tenantId },
+        data,
+        include: {
+          product: true,
+        },
+      });
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'ContactRequest' });
+    }
   }
 
   /**
@@ -171,22 +188,30 @@ export class ContactRequestService {
     // Garante que a solicitação existe e pertence ao tenant antes de remover
     await this.findOne(id);
 
-    return this.prisma.contactRequest.delete({
-      where: { id, tenantId },
-    });
+    try {
+      return await this.prisma.contactRequest.delete({
+        where: { id, tenantId },
+      });
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'ContactRequest' });
+    }
   }
 
   private async ensureUserBelongsToTenant(userId: string, tenantId: string) {
-    const user = await this.prisma.user.findFirst({
-      where: {
-        id: userId,
-        tenantId,
-      },
-      select: { id: true },
-    });
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: {
+          id: userId,
+          tenantId,
+        },
+        select: { id: true },
+      });
 
-    if (!user) {
-      throw new BadRequestException('Usuario informado nao pertence ao tenant atual.');
+      if (!user) {
+        throw new BadRequestException('Usuario informado nao pertence ao tenant atual.');
+      }
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'User' });
     }
   }
 }

@@ -7,6 +7,7 @@ import {
   UploadedFiles,
   UseGuards,
   UseInterceptors,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
@@ -17,6 +18,7 @@ import { join } from 'path';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { S3Service } from './s3.service';
+import { Logger } from 'nestjs-pino';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
@@ -77,6 +79,7 @@ const uploadOptions = {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('upload')
 export class UploadController {
+  constructor(private readonly logger: Logger) {}
   @Post('image')
   @ApiOperation({ summary: 'Realizar o upload de uma unica imagem' })
   @ApiConsumes('multipart/form-data')
@@ -177,15 +180,38 @@ export class UploadController {
     const uploadDirectory = join(process.cwd(), 'uploads', tenantId);
     const absolutePath = join(uploadDirectory, filename);
 
-    await mkdir(uploadDirectory, { recursive: true });
-    await writeFile(absolutePath, file.buffer, { flag: 'wx' });
+    try {
+      await mkdir(uploadDirectory, { recursive: true });
+      await writeFile(absolutePath, file.buffer, { flag: 'wx' });
 
-    return {
-      url: `/uploads/${tenantId}/${filename}`,
-      filename,
-      mimeType: file.mimetype,
-      size: file.size,
-    };
+      return {
+        url: `/uploads/${tenantId}/${filename}`,
+        filename,
+        mimeType: file.mimetype,
+        size: file.size,
+      };
+    } catch (err: any) {
+      // Log structured error with requestId/tenantId
+      const requestId = (request as any).requestId;
+      const tenant = tenantId;
+      this.logger.error({ err: String(err), requestId, tenant }, 'UploadController: failed to persist image');
+
+      // Map common Node fs errors to readable HTTP errors
+      if (err && err.code) {
+        switch (err.code) {
+          case 'EACCES':
+            throw new InternalServerErrorException('Permissao negada ao gravar arquivo de upload.');
+          case 'ENOSPC':
+            throw new InternalServerErrorException('Espaco em disco insuficiente no servidor.');
+          case 'EEXIST':
+            throw new BadRequestException('Arquivo ja existe.');
+          default:
+            throw new InternalServerErrorException('Falha ao persistir arquivo de upload.');
+        }
+      }
+
+      throw new InternalServerErrorException('Falha ao persistir arquivo de upload.');
+    }
   }
 
   private getTenantId(request: Request) {

@@ -5,6 +5,7 @@ import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
 import * as bcrypt from 'bcryptjs';
 import { UserRole } from '@prisma/client';
+import { PrismaErrorHandler } from '../shared/prisma-error.handler';
 
 @Injectable()
 export class TenantAdminService {
@@ -42,57 +43,93 @@ export class TenantAdminService {
           throw new BadRequestException(`Já existe um usuário cadastrado com o e-mail '${adminEmail}'.`);
         }
 
-        const hashedPassword = await bcrypt.hash(adminPassword, 10);
-        await prisma.user.create({
+      return await this.prisma.$transaction(async (prisma) => {
+        // Criação da loja
+        const tenant = await prisma.tenantStore.create({
           data: {
-            email: adminEmail,
-            password: hashedPassword,
-            role: UserRole.TENANT_ADMIN,
-            tenantId: tenant.id,
+            name,
+            isActive,
+            themeConfig,
+            logoUrl,
+            whatsapp,
           },
         });
-      }
-      return tenant;
-    });
+
+        // Criação opcional do usuário administrador da loja
+        if (adminEmail && adminPassword) {
+          const existingAdminUser = await prisma.user.findFirst({
+            where: { email: adminEmail, tenantId: tenant.id },
+          });
+          if (existingAdminUser) {
+            throw new BadRequestException(`Já existe um usuário cadastrado com o e-mail '${adminEmail}'.`);
+          }
+
+          const hashedPassword = await bcrypt.hash(adminPassword, 10);
+          await prisma.user.create({
+            data: {
+              email: adminEmail,
+              password: hashedPassword,
+              role: UserRole.TENANT_ADMIN,
+              tenantId: tenant.id,
+            },
+          });
+        }
+        return tenant;
+      });
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'Tenant' });
+    }
   }
 
   /**
    * Lista todas as lojas cadastradas no sistema
    */
   async findAllTenants() {
-    return this.prisma.tenantStore.findMany({
-      include: { users: { select: { id: true, email: true } } },
-    });
+    try {
+      return await this.prisma.tenantStore.findMany({
+        include: { users: { select: { id: true, email: true } } },
+      });
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'Tenant' });
+    }
   }
 
   /**
    * Busca os detalhes de uma loja específica pelo ID
    */
   async findOne(id: string) {
-    const tenant = await this.prisma.tenantStore.findUnique({
-      where: { id },
-      include: { users: { select: { id: true, email: true } } },
-    });
-    if (!tenant) {
-      throw new NotFoundException(`Loja com ID "${id}" não encontrada.`);
+    try {
+      const tenant = await this.prisma.tenantStore.findUnique({
+        where: { id },
+        include: { users: { select: { id: true, email: true } } },
+      });
+      if (!tenant) {
+        throw new NotFoundException(`Loja com ID "${id}" não encontrada.`);
+      }
+      return tenant;
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'Tenant' });
     }
-    return tenant;
   }
 
   async findAllUsersByTenant(id: string) {
-    return await this.prisma.user.findMany({
-      where: { tenantId: id },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    try {
+      return await this.prisma.user.findMany({
+        where: { tenantId: id },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          phone: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'User' });
+    }
   }
 
   /**
@@ -104,21 +141,29 @@ export class TenantAdminService {
     // Garante que a loja existe antes de atualizar
     await this.findOne(id); 
 
-    return this.prisma.tenantStore.update({
-      where: { id },
-      data: {
-        ...dataToUpdate,
-        logoUrl,
-        whatsapp,
-      },
-    });
+    try {
+      return await this.prisma.tenantStore.update({
+        where: { id },
+        data: {
+          ...dataToUpdate,
+          logoUrl,
+          whatsapp,
+        },
+      });
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'Tenant' });
+    }
   }
 
   /**
    * Remove uma loja do sistema
    */
   async remove(id: string) {
-    await this.findOne(id);
-    return this.prisma.tenantStore.delete({ where: { id } });
+    try {
+      await this.findOne(id);
+      return await this.prisma.tenantStore.delete({ where: { id } });
+    } catch (err) {
+      PrismaErrorHandler.handle(err, { entity: 'Tenant' });
+    }
   }
 }
