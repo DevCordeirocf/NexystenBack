@@ -45,14 +45,6 @@ ENV PORT=3001
 EXPOSE $PORT
 
 # Script de inicialização que trata migrações opcionalmente
-RUN echo '#!/bin/sh\n\
-if [ -z "$DATABASE_URL" ]; then\n\
-  echo "DATABASE_URL não definido, iniciando sem migrações"\n\
-else\n\
-  echo "Aplicando migrações do Prisma..."\n\
-  npx prisma migrate deploy || echo "Migrações já aplicadas ou falharam"\n\
-fi\n\
-echo "Iniciando aplicação..."\n\
-node dist/src/main.js' > /app/start.sh && chmod +x /app/start.sh
+RUN echo '#!/bin/sh\nset -e\n\nif [ -z "$DATABASE_URL" ]; then\n  echo "DATABASE_URL não definido, iniciando sem migrações"\nelse\n  echo "Criando .env temporário com DATABASE_URL para o Prisma"\n  echo "DATABASE_URL=$DATABASE_URL" > /app/.env\n  export DATABASE_URL\n  echo "Aplicando migrações do Prisma..."\n  npx prisma migrate deploy --schema=/app/prisma/schema.prisma || echo "Migrações já aplicadas ou falharam"\nfi\n\necho "Iniciando aplicação..."\nnode dist/src/main.js' > /app/start.sh && chmod +x /app/start.sh
 
 CMD ["/app/start.sh"]

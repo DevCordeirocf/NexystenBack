@@ -121,4 +121,10 @@ src/
 
 ```
 
+## Deploy (Render)
+
+- Certifique-se de configurar a variável de ambiente DATABASE_URL no painel do Render (ou outro provedor) antes de permitir que a aplicação aplique migrações automaticamente.
+- O container só executa `npx prisma migrate deploy` durante o start se a variável DATABASE_URL estiver definida; caso contrário, a aplicação inicia sem aplicar migrações (comportamento seguro).
+- Se preferir aplicar migrações manualmente: não defina DATABASE_URL no serviço, e execute `npx prisma migrate deploy` a partir de um job/CI ou de um container com acesso ao banco de dados de destino.
+
 ---
