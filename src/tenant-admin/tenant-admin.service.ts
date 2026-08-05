@@ -22,29 +22,8 @@ export class TenantAdminService {
       throw new BadRequestException(`Já existe uma loja cadastrada com o nome '${name}'.`);
     }
 
-    return this.prisma.$transaction(async (prisma: any) => {
-      // Criação da loja
-      const tenant = await prisma.tenantStore.create({
-        data: {
-          name,
-          isActive,
-          themeConfig,
-          logoUrl,
-          whatsapp,
-        },
-      });
-
-      // Criação opcional do usuário administrador da loja
-      if (adminEmail && adminPassword) {
-        const existingAdminUser = await prisma.user.findFirst({
-          where: { email: adminEmail, tenantId: tenant.id },
-        });
-        if (existingAdminUser) {
-          throw new BadRequestException(`Já existe um usuário cadastrado com o e-mail '${adminEmail}'.`);
-        }
-
-      return await this.prisma.$transaction(async (prisma) => {
-        // Criação da loja
+    try {
+      return await this.prisma.$transaction(async (prisma: any) => {
         const tenant = await prisma.tenantStore.create({
           data: {
             name,
@@ -55,7 +34,6 @@ export class TenantAdminService {
           },
         });
 
-        // Criação opcional do usuário administrador da loja
         if (adminEmail && adminPassword) {
           const existingAdminUser = await prisma.user.findFirst({
             where: { email: adminEmail, tenantId: tenant.id },
@@ -74,6 +52,7 @@ export class TenantAdminService {
             },
           });
         }
+
         return tenant;
       });
     } catch (err) {
