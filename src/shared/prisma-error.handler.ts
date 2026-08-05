@@ -5,7 +5,11 @@ import {
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import {
+  PrismaClientInitializationError,
+  PrismaClientKnownRequestError,
+  PrismaClientRustPanicError,
+} from '@prisma/client-runtime-utils';
 
 /**
  * PrismaErrorHandler centraliza o mapeamento de erros do Prisma para exceções HTTP do NestJS.
@@ -18,8 +22,9 @@ export class PrismaErrorHandler {
 
     if (error && typeof error === 'object') {
       // Known Prisma errors have specific classes under Prisma
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        switch (error.code) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        const prismaError = error as PrismaClientKnownRequestError;
+        switch (prismaError.code) {
           case 'P2002': // Unique constraint failed
             throw new ConflictException(`${entityLabel}já existe.`);
 
@@ -37,8 +42,8 @@ export class PrismaErrorHandler {
       }
 
       if (
-        error instanceof Prisma.PrismaClientInitializationError ||
-        error instanceof (Prisma as any).PrismaClientRustPanicError
+        error instanceof PrismaClientInitializationError ||
+        error instanceof PrismaClientRustPanicError
       ) {
         throw new ServiceUnavailableException('Serviço de banco de dados indisponível.');
       }
