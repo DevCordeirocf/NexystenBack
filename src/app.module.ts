@@ -1,5 +1,6 @@
 // src/app.module.ts
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -13,9 +14,17 @@ import { TenantAdminModule } from './tenant-admin/tenant-admin.module';
 import { CategoryModule } from './category/category.module';
 import { UploadModule } from './upload/upload.module'; 
 import { RateLimitMiddleware } from './shared/middleware/rate-limit.middleware';
+import { RequestContextMiddleware } from './shared/middleware/request-context.middleware';
 
 @Module({
   imports: [
+    LoggerModule.forRoot({
+      pinoHttp: {
+        level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+        // Use pino-pretty in non-production for readable logs
+        transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty', options: { colorize: true } } : undefined,
+      },
+    }),
     PrismaModule, // Primeiro o banco
     TenantModule, // Depois o contexto do tenant
     AuthModule,
@@ -28,6 +37,8 @@ import { RateLimitMiddleware } from './shared/middleware/rate-limit.middleware';
   controllers: [AppController], 
   providers: [
     AppService,
+    RequestContextMiddleware,
+    RateLimitMiddleware,
     {
       provide: APP_INTERCEPTOR,
       useClass: TenantInterceptor,
@@ -36,6 +47,7 @@ import { RateLimitMiddleware } from './shared/middleware/rate-limit.middleware';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(RateLimitMiddleware).forRoutes('*');
+    // Aplica RequestId primeiro para que middlewares posteriores (rate-limit, etc.) possam usar requestId
+    consumer.apply(RequestContextMiddleware, RateLimitMiddleware).forRoutes('*');
   }
 }

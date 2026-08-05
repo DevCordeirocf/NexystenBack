@@ -28,8 +28,29 @@ function shouldEnableSwagger() {
  * Função de inicialização da aplicação Nexysten
  */
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // Optional: initialize Sentry if available and configured
+  if (process.env.SENTRY_DSN) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const Sentry = require('@sentry/node');
+      Sentry.init({ dsn: process.env.SENTRY_DSN });
+      console.log('Sentry initialized');
+    } catch (err) {
+      console.warn('Sentry requested but package not installed or failed to init:', err);
+    }
+  }
+
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
   app.set('trust proxy', 1);
+
+  // Use nestjs-pino logger as Nest's logger if available
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { Logger } = require('nestjs-pino');
+    app.useLogger(app.get(Logger));
+  } catch (err) {
+    // ignore if package missing or injection fails
+  }
 
   // Configuração para servir arquivos estáticos (uploads de imagens)
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {

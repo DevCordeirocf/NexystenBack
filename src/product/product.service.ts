@@ -10,6 +10,7 @@ import { TenantContextService } from '../tenant/tenant-context.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { UserRole } from '@prisma/client';
+import { PrismaErrorHandler } from '../shared/prisma-error.handler';
 
 @Injectable()
 export class ProductService {
@@ -46,7 +47,7 @@ export class ProductService {
         }
       });
     } catch (error: any) {
-      this.handlePrismaError(error, 'Erro ao criar o produto.');
+      PrismaErrorHandler.handle(error, { entity: 'Product' });
     }
   }
 
@@ -80,7 +81,7 @@ export class ProductService {
         orderBy: { createdAt: 'desc' },
       });
     } catch (error: any) {
-      this.handlePrismaError(error, 'Erro ao listar os produtos.');
+      PrismaErrorHandler.handle(error, { entity: 'Product' });
     }
   }
 
@@ -136,7 +137,7 @@ export class ProductService {
         }
       });
     } catch (error: any) {
-      this.handlePrismaError(error, 'Erro ao atualizar o produto.');
+      PrismaErrorHandler.handle(error, { entity: 'Product' });
     }
   }
 
@@ -157,7 +158,7 @@ export class ProductService {
           'Não é possível excluir este produto pois existem solicitações de contato (leads) ou histórico vinculados a ele. Recomendamos inativar o produto.'
         );
       }
-      this.handlePrismaError(error, 'Erro ao excluir o produto.');
+      PrismaErrorHandler.handle(error, { entity: 'Product' });
     }
   }
 
@@ -185,28 +186,7 @@ export class ProductService {
         }
       });
     } catch (error: any) {
-      this.handlePrismaError(error, 'Erro ao atualizar a disponibilidade do produto.');
-    }
-  }
-
-  /**
-   * Método privado para centralizar o tratamento de erros nativos do Prisma.
-   */
-  private handlePrismaError(error: any, defaultMessage: string): never {
-    if (error.status) {
-      throw error;
-    }
-
-    switch (error.code) {
-      case 'P2002':
-        throw new ConflictException('Já existe um registro com estes dados únicos neste tenant.');
-      case 'P2025':
-        throw new NotFoundException('Registro não encontrado na base de dados.');
-      case 'P2014':
-        throw new BadRequestException('A alteração solicitada viola uma relação exigida pelo banco de dados.');
-      default:
-        console.error(`[ProductService Error]: ${error.message || error}`);
-        throw new InternalServerErrorException(defaultMessage);
+      PrismaErrorHandler.handle(error, { entity: 'Product' });
     }
   }
 
