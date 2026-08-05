@@ -17,11 +17,31 @@ export class TenantAdminService {
   async create(createTenantDto: CreateTenantDto) {
     const { name, isActive, themeConfig, logoUrl, whatsapp, adminEmail, adminPassword } = createTenantDto;
 
-    try {
-      const existingTenant = await this.prisma.tenantStore.findUnique({ where: { name } });
-      if (existingTenant) {
-        throw new BadRequestException(`Já existe uma loja cadastrada com o nome '${name}'.`);
-      }
+    const existingTenant = await this.prisma.tenantStore.findUnique({ where: { name } });
+    if (existingTenant) {
+      throw new BadRequestException(`Já existe uma loja cadastrada com o nome '${name}'.`);
+    }
+
+    return this.prisma.$transaction(async (prisma: any) => {
+      // Criação da loja
+      const tenant = await prisma.tenantStore.create({
+        data: {
+          name,
+          isActive,
+          themeConfig,
+          logoUrl,
+          whatsapp,
+        },
+      });
+
+      // Criação opcional do usuário administrador da loja
+      if (adminEmail && adminPassword) {
+        const existingAdminUser = await prisma.user.findFirst({
+          where: { email: adminEmail, tenantId: tenant.id },
+        });
+        if (existingAdminUser) {
+          throw new BadRequestException(`Já existe um usuário cadastrado com o e-mail '${adminEmail}'.`);
+        }
 
       return await this.prisma.$transaction(async (prisma) => {
         // Criação da loja

@@ -17,6 +17,7 @@ import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { S3Service } from './s3.service';
 import { Logger } from 'nestjs-pino';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -134,6 +135,48 @@ export class UploadController {
     const tenantId = this.getTenantId(request);
     const imageType = this.detectImageType(file);
     const filename = `${randomUUID()}.${imageType.extension}`;
+
+    // If R2/S3 is configured, upload to object storage; otherwise fallback to local filesystem
+    const useObjectStorage = (process.env.USE_R2 === 'true') || !!process.env.R2_BUCKET;
+
+    if (useObjectStorage) {
+      const bucket = process.env.R2_BUCKET as string;
+      if (!bucket) {
+        throw new BadRequestException('R2_BUCKET nao configurado.');
+      }
+
+      const key = `${tenantId}/${filename}`;
+
+      const s3 = new S3Service({
+        region: process.env.R2_REGION,
+        endpoint: process.env.R2_ENDPOINT,
+        accessKeyId: process.env.R2_ACCESS_KEY_ID,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+        forcePathStyle: process.env.R2_FORCE_PATH_STYLE === 'true',
+      });
+
+      // Upload object
+      await s3.putObject(bucket, key, file.buffer, file.mimetype);
+
+      // If a public base URL is provided (e.g., https://<account>.r2.dev), return that; otherwise return a signed GET URL
+      const publicBase = process.env.R2_PUBLIC_BASE_URL;
+      let url: string;
+      if (publicBase) {
+        const trimmed = publicBase.replace(/\/$/, '');
+        url = `${trimmed}/${bucket}/${key}`;
+      } else {
+        url = await s3.getSignedUrl(bucket, key, 60 * 60); // 1 hour
+      }
+
+      return {
+        url,
+        filename,
+        mimeType: file.mimetype,
+        size: file.size,
+      };
+    }
+
+    // Fallback: local filesystem (existing behavior)
     const uploadDirectory = join(process.cwd(), 'uploads', tenantId);
     const absolutePath = join(uploadDirectory, filename);
 
