@@ -38,8 +38,7 @@ export class PrismaErrorHandler {
 
       if (
         error instanceof Prisma.PrismaClientInitializationError ||
-        // @ts-expect-error: rust panic type may not exist at compile time dependendo da versão do Prisma
-        (Prisma as any).PrismaClientRustPanicError && error instanceof (Prisma as any).PrismaClientRustPanicError
+        error instanceof (Prisma as any).PrismaClientRustPanicError
       ) {
         throw new ServiceUnavailableException('Serviço de banco de dados indisponível.');
       }

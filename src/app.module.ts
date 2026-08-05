@@ -37,6 +37,8 @@ import { RequestContextMiddleware } from './shared/middleware/request-context.mi
   controllers: [AppController], 
   providers: [
     AppService,
+    RequestContextMiddleware,
+    RateLimitMiddleware,
     {
       provide: APP_INTERCEPTOR,
       useClass: TenantInterceptor,

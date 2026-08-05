@@ -36,7 +36,7 @@ async function bootstrap() {
       Sentry.init({ dsn: process.env.SENTRY_DSN });
       console.log('Sentry initialized');
     } catch (err) {
-      console.warn('Sentry requested but package not installed or failed to init:', err.message || err);
+      console.warn('Sentry requested but package not installed or failed to init:', err);
     }
   }
 

@@ -33,19 +33,22 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? exception.getResponse()
         : 'Erro interno no servidor';
 
+    const requestId = (request as any).requestId || (request.headers['x-request-id'] as string) || undefined;
+
     // Monta o objeto de resposta padronizado
     const errorResponse = {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
       method: request.method,
+      requestId,
       message: typeof exceptionResponse === 'object' ? (exceptionResponse as any).message || exceptionResponse : exceptionResponse,
       error: typeof exceptionResponse === 'object' ? (exceptionResponse as any).error || 'Internal Server Error' : 'Internal Server Error',
     };
 
     // Log detalhado no terminal para facilitar o debug
     this.logger.error(
-      `[${request.method}] ${request.url} | Status: ${status} | Erro: ${JSON.stringify(errorResponse.message)}`,
+      `[${request.method}] ${request.url} | Status: ${status} | RequestId: ${requestId || 'none'} | Erro: ${JSON.stringify(errorResponse.message)}`,
       exception instanceof Error ? exception.stack : '',
     );
 

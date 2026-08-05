@@ -6,7 +6,7 @@ type RateLimitRule = {
   name: string;
   windowMs: number;
   maxRequests: number;
-  match: (request: Request) => boolean;
+  match: (path: string, request: Request) => boolean;
 };
 
 type RateLimitEntry = {
@@ -24,21 +24,21 @@ export class RateLimitMiddleware implements NestMiddleware {
       name: 'auth-login',
       windowMs: 15 * 60 * 1000,
       maxRequests: 10,
-      match: (request) => request.method === 'POST' && request.path === '/auth/login',
+      match: (path, request) => request.method === 'POST' && path === '/auth/login',
     },
     {
       name: 'public-write',
       windowMs: 60 * 60 * 1000,
       maxRequests: 30,
-      match: (request) =>
+      match: (path, request) =>
         request.method === 'POST' &&
-        ['/auth/register-customer', '/contact-requests'].includes(request.path),
+        ['/auth/register-customer', '/contact-requests'].includes(path),
     },
     {
       name: 'upload',
       windowMs: 60 * 60 * 1000,
       maxRequests: 60,
-      match: (request) => request.method === 'POST' && request.path.startsWith('/upload'),
+      match: (path, request) => request.method === 'POST' && path.startsWith('/upload'),
     },
   ];
 
@@ -59,7 +59,8 @@ export class RateLimitMiddleware implements NestMiddleware {
   }
 
   async use(request: Request & { requestId?: string }, _response: Response, _next: NextFunction) {
-    const rule = this.rules.find((item) => item.match(request));
+    const normalizedPath = this.getRequestPath(request);
+    const rule = this.rules.find((item) => item.match(normalizedPath, request));
 
     if (!rule) {
       return _next();
@@ -76,16 +77,19 @@ export class RateLimitMiddleware implements NestMiddleware {
         if (count === 1) {
           await this.redisClient.expire(key, windowSeconds);
         }
-
+ 
         if (count > rule.maxRequests) {
           const ttl = await this.redisClient.ttl(key);
           const retryAfterSeconds = ttl > 0 ? ttl : windowSeconds;
           this.logger.warn({ rule: rule.name, clientIp, requestId: request.requestId, retryAfterSeconds }, 'Rate limit exceeded');
           throw new HttpException({ statusCode: 429, message: 'Muitas requisicoes. Tente novamente mais tarde.', retryAfterSeconds }, 429);
         }
-
+ 
         return _next();
       } catch (err) {
+        if (err instanceof HttpException) {
+          throw err;
+        }
         // If Redis fails unexpectedly, log and fall back to in-memory behavior
         this.logger.error({ err: String(err), requestId: request.requestId }, 'RateLimitMiddleware: Redis error, falling back to in-memory limiter');
       }
@@ -111,8 +115,24 @@ export class RateLimitMiddleware implements NestMiddleware {
   }
 
   private getClientIp(request: Request) {
+    const forwarded = request.headers['x-forwarded-for'];
+    if (typeof forwarded === 'string' && forwarded.length > 0) {
+      return forwarded.split(',')[0].trim();
+    }
+
     const ip = (request as any).ip || request.socket.remoteAddress || 'unknown';
     return ip as string;
   }
+
+  private getRequestPath(request: Request) {
+    const rawPath =
+      request.originalUrl ||
+      `${(request as any).baseUrl || ''}${request.url || ''}` ||
+      request.path ||
+      '';
+
+    return rawPath.split('?')[0];
+  }
 }
+
   
