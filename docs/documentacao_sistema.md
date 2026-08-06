@@ -185,25 +185,4 @@ Segurança e boas práticas
 - Garantir JWT_SECRET forte em produção e rotacionar MASTER_ADMIN_PASSWORD após primeiro uso.
 - Proteger credenciais do S3 e outras chaves em cofres de segredos do provedor.
 
-Recomendações e próximos passos
 
-- Gerar um diagrama ER visual a partir do schema.prisma (ferramentas como dbdiagram.io ou prisma-dbml-generator ajudam).
-- Documentar em Swagger exemplos de uso para cada endpoint protegido (ex.: exemplo de Bearer token e uso de X-Tenant-ID em rotas públicas).
-- Adicionar CI para rodar lint e testes automaticamente em PRs.
-- Se houver necessidade de alta disponibilidade, externalizar o Postgres para um serviço gerenciado e habilitar backups.
-
-Anexos e referências rápidas
-
-- Arquivo principal: src/main.ts — bootstrap e configuração (CORS, Swagger, Static assets)
-- Schema Prisma: prisma/schema.prisma
-- Docker Compose: docker-compose.yml
-- Variáveis de ambiente de referência: .env.example
-- Scripts: package.json
-
-
-Se desejar, posso:
-- Gerar um diagrama ER simplificado em ASCII ou em Markdown.
-- Extrair automaticamente a lista completa de endpoints (rota, método, DTOs) diretamente do código/Swagger JSON.
-- Criar exemplos práticos (curl/postman) para os endpoints principais.
-
-Fim do documento.
