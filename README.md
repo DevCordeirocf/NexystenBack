@@ -128,3 +128,13 @@ src/
 - Se preferir aplicar migrações manualmente: não defina DATABASE_URL no serviço, e execute `npx prisma migrate deploy` a partir de um job/CI ou de um container com acesso ao banco de dados de destino.
 
 ---
+
+Documentação completa do sistema
+
+Um documento detalhado com a descrição do sistema (arquitetura, modelos de dados, módulos, endpoints, variáveis de ambiente, scripts e recomendações) foi adicionado ao repositório:
+
+- documentacao_sistema.md
+
+Consulte esse arquivo para uma visão técnica completa e instruções adicionais. Também é possível acessar a documentação interativa (Swagger) com a aplicação em execução: `http://localhost:3001/api`.
+
+---
